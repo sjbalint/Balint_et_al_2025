@@ -2,5 +2,35 @@
 title: "Core_GrainSIze"
 author: "Balint"
 date: "9/9/2021"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
+    theme: cerulean
+    word_document: default
 ---
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+
+library("G2Sd")
+library("tidyverse")
+
+#import data
+filepath <- "L:/Public/Sawyer Balint/RStudio/wickford_cores/data"
+north <- read.csv(paste0(filepath,"/AC2_grainsize.csv"))
+middle <- read.csv(paste0(filepath,"/M6_grainsize.csv"))
+south <- read.csv(paste0(filepath,"/S3_grainsize.csv"))
+
+#create temporary dataframe to explore G2Sd
+data_temp <- north
+data_temp[1]<-NULL#need to average replicates
+
+#make demonstration data
+data(granulo)
+print(granulo)
+
+#test functions of G2Sd
+grandistrib(granulo) #distribution of each station
+granplot(granulo) #cumulative plot of all stations
+granstat(granulo) #statistics for each station
+
+```
