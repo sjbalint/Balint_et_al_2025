@@ -11,26 +11,111 @@ output:
 ```{r setup, include=FALSE} 
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 
-library("G2Sd")
-library("tidyverse")
+```
+
+Import Data:
+
+```{r}
+#load libraries
+library(readxl)
+library(dplyr)
 
 #import data
-filepath <- "L:/Public/Sawyer Balint/RStudio/wickford_cores/data"
-north <- read.csv(paste0(filepath,"/AC2_grainsize.csv"))
-middle <- read.csv(paste0(filepath,"/M6_grainsize.csv"))
-south <- read.csv(paste0(filepath,"/S3_grainsize.csv"))
+filepath <- "L:/Public/Sawyer Balint/RStudio/wickford_cores/data/"
+#filepath <- "C:/Users/sbalint/OneDrive - Environmental Protection Agency (EPA)/Profile/Desktop/Backup/Sawyer Balint/RStudio/wickford_cores/data/"
+all_cores <- read_excel(paste0(filepath,"grainsize_tidy.xlsx"))
 
-#create temporary dataframe to explore G2Sd
-data_temp <- north
-data_temp[1]<-NULL#need to average replicates
+#remove replicate information
+all_cores[3:4] <- NULL
 
-#make demonstration data
-data(granulo)
-print(granulo)
+```
 
-#test functions of G2Sd
-grandistrib(granulo) #distribution of each station
-granplot(granulo) #cumulative plot of all stations
-granstat(granulo) #statistics for each station
+Next, we will try to make grainsize distribution plots using G2Sd:
+
+```{r}
+library(G2Sd)
+library(tidyverse)
+
+#create a list of cores
+core_list <- c("North", "Middle", "South")
+
+#iterate over list
+for (i in core_list){
+  temp_df <- subset(all_cores,Core==i)
+  temp_df[1] <- NULL
+  temp_df <- aggregate(temp_df,list(temp_df$Depth),mean)
+  depths <- temp_df$Depth
+  temp_df[1:2] <- NULL
+  temp_df <- as.data.frame(t(temp_df))
+  colnames(temp_df) <- depths
+  head(temp_df)
+  grandistrib(temp_df,main=i,xlab="Depth")
+}
+
+```
+
+The plots looks compelling and informative. However, I'd like to make them from scratch to modify the grain-size classes and orientation of the figure. First, we need to convert the data to a long format and classify it:
+
+```{r}
+#create a list of cores
+
+grainsizes <- data.frame(c("Clay","Silt","C. Silt","V. F. Sand","F. Sand","Sand","C. Sand","V. C. Sand","V. F. Gravel"),c(3,30,60,120,270,500,1000,2000,4000))
+
+colnames(grainsizes) <- c("Classification","Micrometers")
+
+core_list <- c("North", "Middle", "South")
+
+all_cores_class <- data.frame(matrix(nrow=0,ncol=5))
+
+#iterate over list
+for (i in core_list){
+  temp_df <- subset(all_cores,Core==i)
+  temp_df[1] <- NULL
+  temp_df <- aggregate(temp_df,list(temp_df$Depth),mean)
+  temp_df[1] <- NULL
+  temp_df <- pivot_longer(temp_df,!Depth,names_to="Grainsize",values_to="Percentage")
+  temp_df$Grainsize <- as.numeric(as.character(temp_df$Grainsize))
+  temp_df$Class <- NA
+  temp_df$Core <- i
+  for (x in 1:nrow(temp_df)){
+    for (y in 1:nrow(grainsizes)){
+      if (temp_df$Grainsize[x]<grainsizes[y,2]){
+        temp_df$Class[x] <- grainsizes[y,1]
+        break
+      }
+    }
+  }
+  all_cores_class <- rbind(all_cores_class,temp_df)
+  all_cores_class$Class <- factor(all_cores_class$Class,
+                                  levels=c("Clay","Silt","C. Silt","V. F. Sand","F. Sand","Sand","C. Sand","V. C. Sand"))
+  all_cores_class$Core <- factor(all_cores_class$Core,
+                                  levels=c("North","Middle","South"))
+}
+```
+
+Export the data to an excel sheet:
+
+```{r}
+library(xlsx)
+
+write.xlsx2(all_cores_class, paste0(filepath,"grainsize_long.xlsx"), sheetName = "Sheet1",
+  col.names = TRUE, row.names = TRUE, append = FALSE)
+
+```
+
+Create a graph of grainsize distribution for all three cores:
+
+```{r}
+library(RColorBrewer)
+
+theme_set(theme_classic())
+
+ggplot(all_cores_class, aes(x=Depth,y=Percentage, fill=Class))+
+  geom_bar(position="fill",stat="identity",width=2)+
+  coord_flip()+
+  scale_x_reverse()+
+  scale_fill_brewer(palette="Spectral")+
+  facet_wrap(~Core)+
+  theme(strip.background = element_blank())
 
 ```
