@@ -1,0 +1,47 @@
+---
+title: "Core_Isotopes"
+author: "Balint"
+date: "10/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+Import Data:
+
+```{r}
+#load libraries
+library(readxl)
+library(dplyr)
+
+#import data
+all_isotopes <- read_excel("data/isotopes_tidy.xlsx")
+
+colnames(all_isotopes) <- c("Core","Location","Depth","Water","Bulk","Grainsize","d15N","%N","d13C.total","d13C.inorg","%C.total","%C.organic","%C.inorg","% inorg","C-N")
+
+```
+
+Plot isotope data:
+
+```{r}
+theme_set(theme_minimal())
+
+subset <- all_isotopes[c("Location","Depth","d15N","%N", "d13C.total","%C.organic")]
+
+subset <- pivot_longer(subset,cols=3:ncol(subset))
+
+ggplot(subset, aes(x=Depth, y=value, group=Location, color=Location))+
+  geom_smooth()+
+  geom_point()+
+  coord_flip()+
+  scale_x_reverse()+
+  facet_wrap(~name, scales="free_x",
+             strip.position = "bottom",
+             labeller = as_labeller(c(`%N` = "%N", d15N = "d15N (permil)", `%C.organic` = "%C Organic",d13C.total = "d13C (permil)")))+
+  ylab(NULL) +
+  theme(strip.background = element_blank(), strip.placement = "outside")+
+  xlab("Depth (cm)")
+
+```
