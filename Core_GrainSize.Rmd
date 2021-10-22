@@ -63,9 +63,11 @@ write.xlsx2(temp_df, paste0(filepath,"grainsize_wide.xlsx"), sheetName = "Sheet1
 The plots looks compelling and informative. However, I'd like to make them from scratch to modify the grain-size classes and orientation of the figure. First, we need to convert the data to a long format and classify it:
 
 ```{r}
+library(tidyverse)
 #create a list of cores
+size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt","V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V. F. Gravel")
 
-grainsizes <- data.frame(c("Clay","Silt","C. Silt","V. F. Sand","F. Sand","Sand","C. Sand","V. C. Sand","V. F. Gravel"),c(3,30,60,120,270,500,1000,2000,4000))
+grainsizes <- data.frame(size_classes,c(2,4,8,16,31,62,125,250,500,1000,2000,4000))
 
 colnames(grainsizes) <- c("Classification","Micrometers")
 
@@ -102,7 +104,7 @@ for (i in core_list){
   }
   all_cores_class <- rbind(all_cores_class,temp_df)
   all_cores_class$Class <- factor(all_cores_class$Class,
-                                  levels=c("Clay","Silt","C. Silt","V. F. Sand","F. Sand","Sand","C. Sand","V. C. Sand","V. F. Gravel"))
+                                  levels=size_classes)
   all_cores_class$Location <- factor(all_cores_class$Location,
                                   levels=c("North","Middle","South"))
 }
