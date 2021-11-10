@@ -65,7 +65,7 @@ The plots looks compelling and informative. However, I'd like to make them from 
 ```{r}
 library(tidyverse)
 #create a list of cores
-size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt","V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V. F. Gravel")
+size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt","V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V.F. Gravel")
 
 grainsizes <- data.frame(size_classes,c(2,4,8,16,31,62,125,250,500,1000,2000,4000))
 
@@ -125,14 +125,17 @@ Create a graph of grainsize distribution for all three cores:
 ```{r}
 library(RColorBrewer)
 
-theme_set(theme_classic())
+theme_set(theme_bw())
 
 ggplot(all_cores_class, aes(x=Depth,y=Percentage, fill=Class))+
   geom_bar(position="fill",stat="identity",width=2)+
   coord_flip()+
-  scale_x_reverse()+
+  scale_x_reverse(labels=function(x)2020-(x*3))+
   scale_fill_brewer(palette="Spectral")+
   facet_wrap(~Location)+
-  theme(strip.background = element_blank())
+  theme(strip.background = element_blank())+
+  xlab("Year (estimated)")
+
+ggsave("figures/grainsize.png",width=9, height=6)
 
 ```
