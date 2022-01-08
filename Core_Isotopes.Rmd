@@ -19,7 +19,7 @@ library(tidyverse)
 #import data
 all_isotopes <- read_excel("data/isotopes_tidy.xlsx")
 
-colnames(all_isotopes) <- c("Core","Location","Depth","Water","Bulk","Grainsize","d15N","%N","d13C.total","d13C.inorg","%C.total","%C.organic","%C.inorg","% inorg","C-N", '%P.total','N:P')
+colnames(all_isotopes) <- c("Core","Location","Depth","Water","Bulk","Grainsize","d15N","%N","d13C.total","d13C.inorg","%C.total","%C.organic","%C.inorg","% inorg","C:N", '%P.total','N:P')
 
 ```
 
@@ -28,18 +28,17 @@ Plot isotope data:
 ```{r}
 theme_set(theme_bw())
 
-subset <- all_isotopes[c("Location","Depth",'%N',"d15N", "%C.organic")]
+subset <- all_isotopes[c("Location","Depth","d15N", "d13C.total")]
 
-subset <- subset(subset,subset$`%C.organic`<10)
+#subset <- subset(subset,subset$`%C.organic`<10)
 
 subset <- pivot_longer(subset,cols=3:ncol(subset))
 
 subset$name <- factor(
   subset$name,
   labels=c(
-    bquote('%'*C[Organic]),
-    bquote('%'*N),
-    bquote(delta^15*N)
+    bquote(delta^13*C~'(‰)'),
+    bquote(delta^15*N~'(‰)')
     )
   )
 
@@ -52,7 +51,8 @@ ggplot(subset, aes(x=Depth, y=value, group=Location))+
   geom_smooth(aes(color=Location), alpha=0.5, se=FALSE)+
   geom_point(shape=21, size=2.5, aes(fill=Location))+
   coord_flip()+
-  scale_x_reverse(labels=function(x)2020-(x*3))+
+  #scale_x_reverse(labels=function(x)2020-(x*3))+
+  scale_x_reverse()+
   facet_wrap(~name,
              nrow=1,
              scales="free_x",
@@ -63,12 +63,8 @@ ggplot(subset, aes(x=Depth, y=value, group=Location))+
   theme(
     strip.background = element_blank(),
     strip.placement = "outside",
-    legend.position = c(0.74, 0.88),
-    legend.background = element_rect(fill="white",
-                                  linetype="solid", 
-                                  colour ="black")
     )+
-  xlab("Year (approximate)")+
+  xlab("Depth (cm)")+
   scale_color_manual(
     values=c(
       "#E69F00", "#999999", "#56B4E9"
@@ -80,14 +76,13 @@ ggplot(subset, aes(x=Depth, y=value, group=Location))+
       )
   )
 
-ggsave("figures/isotopes_2.1.png",width=9, height=6)
+ggsave("figures/isotopes.png",width=8, height=4.5)
 
 ```
 
-
 ```{r}
 
-subset <- all_isotopes[c("Location","Depth",'%N', "%C.organic",'%P.total','N:P')]
+subset <- all_isotopes[c("Location","Depth",'C:N',"N:P", "d15N")]
 
 #subset <- subset(subset,subset$`%C.organic`<10)
 
@@ -95,11 +90,71 @@ subset <- pivot_longer(subset,cols=3:ncol(subset))
 
 subset$name <- factor(
   subset$name,
+  levels=c("C:N","N:P","d15N"),
   labels=c(
-    bquote('%'*C[Organic]),
-    bquote('%'*N),
-    bquote('%'*P[Total]),
-    bquote('N:P')
+    bquote('C:N'~'Ratio'),
+    bquote('N:P'~'Ratio'),
+    bquote(delta^15*N~'(‰)')
+    )
+  )
+
+subset$Location <- factor(
+  subset$Location,
+  levels=c('North','Middle','South')
+  )
+
+ggplot(subset, aes(x=Depth, y=value, group=Location))+
+  geom_smooth(aes(color=Location), alpha=0.5, se=FALSE)+
+  geom_point(shape=21, size=2.5, aes(fill=Location))+
+  coord_flip()+
+  #scale_x_reverse(labels=function(x)2020-(x*3))+
+  scale_x_reverse()+
+  facet_wrap(~name,
+             nrow=1,
+             scales="free_x",
+             strip.position = "bottom",
+             labeller = label_parsed
+             )+
+  ylab(NULL) +
+  theme(
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    legend.position = c(0.74, 0.838),
+    legend.background = element_rect(fill="white",
+                                  linetype="solid", 
+                                  colour ="black")
+    )+
+  xlab("Depth (cm)")+
+  scale_color_manual(
+    values=c(
+      "#E69F00", "#999999", "#56B4E9"
+      )
+  )+
+  scale_fill_manual(
+    values=c(
+      "#E69F00", "#999999", "#56B4E9"
+      )
+  )
+
+ggsave("figures/elemental_ratios.png",width=8, height=4.5)
+
+```
+
+
+```{r}
+
+subset <- all_isotopes[c("Location","Depth",'%N', "%C.organic",'%P.total')]
+
+subset <- subset(subset,subset$`%C.organic`<10)
+
+subset <- pivot_longer(subset,cols=3:ncol(subset))
+
+subset$name <- factor(
+  subset$name,
+  labels=c(
+    bquote(C[Organic]~'(%)'),
+    bquote(N~'(%)'),
+    bquote(P[Total]~x~10^-2~'(%)')
     )
   )
 
@@ -122,7 +177,11 @@ ggplot(subset, aes(x=Depth, y=value, group=Location))+
   ylab(NULL) +
   theme(
     strip.background = element_blank(),
-    strip.placement = "outside")+
+    strip.placement = "outside",
+    legend.position = c(0.74, 0.838),
+    legend.background = element_rect(fill="white",
+                                  linetype="solid", 
+                                  colour ="black"))+
   xlab("Depth (cm)")+
   scale_color_manual(
     values=c(
@@ -135,7 +194,7 @@ ggplot(subset, aes(x=Depth, y=value, group=Location))+
       )
   )
 
-ggsave("figures/elemental_composition.png",width=12, height=6)
+ggsave("figures/elemental_composition_3.png",width=8, height=4.5)
 
 ```
 
@@ -158,7 +217,8 @@ ggplot(subset, aes(x=Depth, y=`N:P`, group=Location))+
   theme(
     strip.background = element_blank(),
     strip.placement = "outside")+
-  xlab("Depth (cm)")+
+  labs(x="Depth (cm)",
+       y="N:P Ratio")+
   scale_color_manual(
     values=c(
       "#E69F00", "#999999", "#56B4E9"
@@ -171,7 +231,7 @@ ggplot(subset, aes(x=Depth, y=`N:P`, group=Location))+
   )+
   geom_hline(yintercept=16,linetype="dashed")
 
-ggsave("figures/NP_Ratio.png",width=6, height=6)
+ggsave("figures/NP_Ratio_2.png",width=6, height=6)
 
 
 ```

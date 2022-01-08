@@ -130,12 +130,14 @@ theme_set(theme_bw())
 ggplot(all_cores_class, aes(x=Depth,y=Percentage, fill=Class))+
   geom_bar(position="fill",stat="identity",width=2)+
   coord_flip()+
-  scale_x_reverse(labels=function(x)2020-(x*3))+
+  #scale_x_reverse(labels=function(x)2020-(x*3))+
+  scale_x_reverse()+
+  scale_y_continuous(labels=function(y)y*100)+
   scale_fill_brewer(palette="Spectral")+
   facet_wrap(~Location)+
   theme(strip.background = element_blank())+
-  xlab("Year (estimated)")
+  xlab("Depth (cm)")
 
-ggsave("figures/grainsize.png",width=9, height=6)
+ggsave("figures/grainsize.png",width=8, height=4.5)
 
 ```
