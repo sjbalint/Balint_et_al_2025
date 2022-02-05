@@ -17,9 +17,21 @@ library(readxl)
 library(tidyverse)
 
 #import data
+isotopes_2 <- read_excel("data/isotopes_2.xlsx") %>%
+  group_by(Location,`Depth`) %>%
+  summarize(`%N`=mean(`%N`),
+            d15N=mean(d15N),
+            `%C.total`=mean(`%C.total`),
+            d13C.total=mean(d13C.total))
+
 all_isotopes <- read_excel("data/isotopes_tidy.xlsx")
 
 colnames(all_isotopes) <- c("Core","Location","Depth","Water","Bulk","Grainsize","d15N","%N","d13C.total","d13C.inorg","%C.total","%C.organic","%C.inorg","% inorg","C:N", '%P.total','N:P')
+
+all_isotopes <- all_isotopes %>%
+  drop_na("d15N")
+
+all_isotopes <- full_join(all_isotopes,isotopes_2)
 
 ```
 
