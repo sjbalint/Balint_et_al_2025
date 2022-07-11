@@ -61,7 +61,7 @@ subset$Location <- factor(
 
 ggplot(subset, aes(x=Depth, y=value, group=Location))+
   geom_smooth(aes(color=Location), alpha=0.5, se=FALSE)+
-  geom_point(shape=21, size=2.5, aes(fill=Location))+
+  geom_point(shape=21, size=1, aes(fill=Location))+
   coord_flip()+
   #scale_x_reverse(labels=function(x)2020-(x*3))+
   scale_x_reverse()+
@@ -117,7 +117,7 @@ subset$Location <- factor(
 
 ggplot(subset, aes(x=Depth, y=value, group=Location))+
   geom_smooth(aes(color=Location), alpha=0.5, se=FALSE)+
-  geom_point(shape=21, size=2.5, aes(fill=Location))+
+  geom_point(shape=21, size=1, aes(fill=Location))+
   coord_flip()+
   #scale_x_reverse(labels=function(x)2020-(x*3))+
   scale_x_reverse()+
