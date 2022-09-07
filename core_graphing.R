@@ -10,13 +10,17 @@ require(progress)
 
 # import data -------------------------------------------------------------
 
-iso.df <- read_excel("data/isotopes_07082022.xlsx",sheet="isotopes")
+iso.df <- read_excel("data/data_08232022.xlsx",sheet="isotopes") %>%
+  mutate(across(location,as.factor))%>%
+  mutate_if(is.character,as.numeric)
 
-P.df <- read_excel("data/isotopes_07082022.xlsx",sheet="phosphorus")
+P.df <- read_excel("data/data_08232022.xlsx",sheet="phosphorus")
 
 iso.df <- left_join(iso.df,P.df)
 
-iso.df$NP <- iso.df$N/iso.df$P.total
+iso.df$NP <- iso.df$`%N`/iso.df$P.total
+
+iso.df$CN <- iso.df$`%C.total`/iso.df$`%N`
 
 iso.df$P.total <- iso.df$P.total*100
 
@@ -33,12 +37,14 @@ myheight=8.5
 legend_title <- NULL
 
 mytheme <- list(
-  geom_smooth(se=FALSE,alpha=0.3),
-  geom_point(size=2,color="black"),
+  geom_smooth(aes(x=depth.cm, y=value, color=location, linetype=location),
+              se=FALSE),
+  geom_point(aes(x=depth.cm, y=value, fill=location, shape=location),
+             size=2.5,color="black",alpha=0.7),
   coord_flip(),
   scale_x_reverse(),
   facet_wrap(~name,nrow=1,scales="free_x",strip.position = "bottom",labeller = label_parsed),
-  labs(y=NULL,x="Depth\n(cm)",shape=legend_title,color=legend_title,fill=legend_title),
+  labs(y=NULL,x="Depth\n(cm)",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
   theme(
     text=element_text(size=12),
     strip.background = element_blank(),
@@ -51,24 +57,25 @@ mytheme <- list(
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
     legend.position = "right"),
-    scale_color_viridis_d(),
-    scale_fill_viridis_d(),
-    scale_shape_manual(values=c(21:24))
+  scale_color_viridis_d(),
+  scale_fill_viridis_d(),
+  scale_shape_manual(values=c(21:24)),
+  scale_linetype_manual(values=c(3,2,1))
 )
 
 
 # plot isotopes -----------------------------------------------------------
 
-long_cols <- c("d13C.org","d15N")
-label_list <- c(bquote(delta^13*C~'(‰)'),
+long_cols <- c("d13C.organic","d15N.permil")
+label_list <- c(bquote(delta^13*C[Organic]~'(‰)'),
                 bquote(delta^15*N~'(‰)'))
 
-temp.df <- iso.df[c("location","depth",long_cols)] %>%
+temp.df <- iso.df[c("location","depth.cm",long_cols)] %>%
   pivot_longer(long_cols)
 
 temp.df$name <- factor(temp.df$name,levels=long_cols,labels=label_list)
 
-ggplot(temp.df, aes(x=depth, y=value, fill=location, color=location, shape=location))+
+ggplot(temp.df)+
   mytheme
 
 ggsave("figures/isotopes.png",width=mywidth, height=myheight)
@@ -77,12 +84,12 @@ ggsave("figures/isotopes.png",width=mywidth, height=myheight)
 
 # elemental ratios --------------------------------------------------------
 
-long_cols <- c("CN","NP","d15N")
+long_cols <- c("CN","NP","d15N.permil")
 label_list <- c(bquote("C:N"~"Ratio"),
                 bquote("N:P"~"Ratio"),
                 bquote(delta^15*N~'(‰)'))
 
-temp.df <- iso.df[c("location","depth",long_cols)]
+temp.df <- iso.df[c("location","depth.cm",long_cols)]
 
 for (row in 1:nrow(temp.df)){
   if (temp.df[row,"NP"]<0 | temp.df[row,"NP"]>40){
@@ -99,7 +106,7 @@ temp.df <- temp.df %>%
 
 temp.df$name <- factor(temp.df$name,levels=long_cols,labels=label_list)
 
-ggplot(temp.df, aes(x=depth, y=value, fill=location, color=location, shape=location))+
+ggplot(temp.df, aes(x=depth.cm, y=value, fill=location, color=location, shape=location))+
   mytheme
 
 ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
@@ -107,19 +114,19 @@ ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
 
 # elemental composition again ---------------------------------------------
 
-long_cols <- c("C.org","N","P.total")
+long_cols <- c("%C.organic","%N","P.total")
 label_list <- c(bquote(C[Organic]~'(%)'),
                 bquote(N~'(%)'),
                 bquote(P[Total]~x~10^-2~'(%)'))
 
-temp.df <- iso.df[c("location","depth",long_cols)]
+temp.df <- iso.df[c("location","depth.cm",long_cols)]
 
 for (row in 1:nrow(temp.df)){
-  if (temp.df[row,"C.org"]>10){
-    temp.df[row,"C.org"] <- NA
+  if (is.na(temp.df[row,"%C.organic"])==FALSE & temp.df[row,"%C.organic"] >10){
+    temp.df[row,"%C.organic"] <- NA
   }
-  if (temp.df[row,"N"]>0.7){
-    temp.df[row,"N"] <- NA
+  if (is.na(temp.df[row,"%N"])==FALSE & temp.df[row,"%N"]>0.7){
+    temp.df[row,"%N"] <- NA
   }
 }
 
@@ -129,7 +136,7 @@ temp.df <- temp.df %>%
 
 temp.df$name <- factor(temp.df$name,levels=long_cols,labels=label_list)
 
-ggplot(temp.df, aes(x=depth, y=value, fill=location, color=location, shape=location))+
+ggplot(temp.df, aes(x=depth.cm, y=value, fill=location, color=location, shape=location))+
   mytheme
 
 ggsave("figures/elements.png",width=mywidth, height=myheight)
@@ -192,8 +199,7 @@ ggplot(grain.df, aes(x=Depth,y=Percentage, fill=Class))+
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
     legend.position = "right")+
-scale_color_viridis_d(option="H")+
-scale_fill_viridis_d(option="H")+
-scale_shape_manual(values=c(21:24))
+scale_color_viridis_d(option='cividis')+
+scale_fill_viridis_d(option="cividis")
 
 ggsave("figures/grainsize.png",width=mywidth, height=myheight)
