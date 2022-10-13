@@ -52,4 +52,22 @@ export.df <- left_join(export.df,n.df)
 
 write.csv(export.df,"data/export/isotopes.csv")
 
+iso.df <- read_excel("data/data_08232022.xlsx",sheet="isotopes") %>%
+  mutate(across(location,as.factor))%>%
+  mutate_if(is.character,as.numeric)
+
+P.df <- read_excel("data/data_08232022.xlsx",sheet="phosphorus")
+
+iso.df <- left_join(iso.df,P.df)
+
+iso.df$NP <- iso.df$`%N`/iso.df$P.total
+
+iso.df$CN <- iso.df$`%C.total`/iso.df$`%N`
+
+iso.df$P.total <- iso.df$P.total*100
+
+iso.df$location <- factor(iso.df$location,levels=c("North","Middle","South"))
+
+save(iso.df,file="Rdata/iso.Rdata")
+
  

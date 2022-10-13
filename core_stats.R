@@ -2,12 +2,12 @@ rm(list = ls()) #clear environment
 
 # import packages ---------------------------------------------------------
 
-require(tidyverse)
-require(readxl)
-require(progress)
-require(knitr)
-require(car)
-require(dunn.test)
+library(tidyverse)
+library(readxl)
+library(progress)
+library(knitr)
+library(car)
+library(dunn.test)
 
 # import data -------------------------------------------------------------
 

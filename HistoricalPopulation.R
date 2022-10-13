@@ -5,7 +5,7 @@ rm(list = ls()) #clear environment
 library(tidyverse)
 library(readxl)
 library(ggpubr)
-library(ggpmisc
+library(ggpmisc)
 library(progress)
 library(cowplot)
 library(lubridate)
