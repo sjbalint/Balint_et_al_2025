@@ -7,6 +7,8 @@ library(readxl)
 
 # import data -------------------------------------------------------------
 
+load("Rdata/dates.Rdata")
+
 mydata.df <- read_excel("data/isotopes_09072022.xlsx") %>%
   filter(ignore==FALSE) %>%
   select(c("location","depth.cm","sample.type","%N","d15N.permil","%C","d13C.permil")) %>%
@@ -67,6 +69,8 @@ iso.df$CN <- iso.df$`%C.total`/iso.df$`%N`
 iso.df$P.total <- iso.df$P.total*100
 
 iso.df$location <- factor(iso.df$location,levels=c("North","Middle","South"))
+
+iso.df <- left_join(iso.df,dates.df)
 
 save(iso.df,file="Rdata/iso.Rdata")
 
