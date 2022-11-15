@@ -7,46 +7,85 @@ library(tidyverse)
 library(readxl)
 library(progress)
 library(RColorBrewer)
+library(ggsci)
 
 
 # import data -------------------------------------------------------------
 
 load("Rdata/iso.Rdata")
 
+load("Rdata/grainsize.Rdata")
+
+# depth shift -------------------------------------------------------------
+
+date_shift <- TRUE
+
+if (date_shift==TRUE){
+  for (row in 1:nrow(iso.df)){
+    if (iso.df[row,"location"]=="South"){
+      iso.df[row,"depth.cm"] <- iso.df[row,"depth.cm"]+12
+      iso.df[row,"date.depth.cm"] <- iso.df[row,"date.depth.cm"]+12
+    }
+    if (iso.df[row,"location"]=="North"){
+      iso.df[row,"depth.cm"] <- iso.df[row,"depth.cm"]+4
+      iso.df[row,"date.depth.cm"] <- iso.df[row,"date.depth.cm"]+4
+    }
+  }
+}
+
+if (date_shift==TRUE){
+  for (row in 1:nrow(grain.df)){
+    if (grain.df[row,"Location"]=="South"){
+      grain.df[row,"Depth"] <- grain.df[row,"Depth"]+12
+    }
+    if (grain.df[row,"Location"]=="North"){
+      grain.df[row,"Depth"] <- grain.df[row,"Depth"]+4
+    }
+  }
+}
+
+
 # graphing parameters -----------------------------------------------------
 
 theme_set(theme_classic())
 
-mywidth=11
-myheight=8.5
+mywidth=9
+myheight=6
 
 legend_title <- NULL
 
+basetheme <- list(
+  coord_flip(),
+  scale_x_reverse(),
+  theme(
+    text=element_text(size=12),
+    strip.background = element_blank(),
+    strip.placement = "outside",
+    panel.grid.major.x = element_blank(), 
+    panel.grid.major.y = element_blank(),
+    strip.text.y.left = element_text(angle = 0,size=12),
+    strip.text.x.bottom = element_text(size=12),
+    axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
+    axis.text.x = element_text(colour = "black"),
+    axis.text.y = element_text(colour = "black"),
+    legend.position = "right")
+)
+
 mytheme <- list(
+  basetheme,
+  geom_vline(aes(xintercept=date.depth.cm,color=location),show_guide = FALSE),
+  geom_label(aes(x=date.depth.cm,y=date.value,label=date.bottom),
+              fill="white",label.size = NA, hjust = 0.8),
   geom_smooth(aes(x=depth.cm, y=value, color=location, 
                   #linetype=location
                   ),
               se=FALSE),
   geom_point(aes(x=depth.cm, y=value, fill=location, shape=location),
              size=2.5,color="black",alpha=0.7),
-  coord_flip(),
-  scale_x_reverse(),
   facet_wrap(~factor,nrow=1,scales="free_x",strip.position = "bottom",labeller = label_parsed),
   labs(y=NULL,x="Depth\n(cm)",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
-  theme(
-    text=element_text(size=12),
-    strip.background = element_blank(),
-    strip.placement = "outside",
-    panel.grid.major.x = element_blank(), 
-    panel.grid.major.y = element_line(size=.1, color="gray"),
-    strip.text.y.left = element_text(angle = 0,size=12),
-    strip.text.x.bottom = element_text(size=12),
-    axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
-    axis.text.x = element_text(colour = "black"),
-    axis.text.y = element_text(colour = "black"),
-    legend.position = "right"),
-  scale_color_viridis_d(),
-  scale_fill_viridis_d(),
+  scale_color_jco(),
+  scale_fill_jco(),
   scale_shape_manual(values=c(21:24)),
   scale_linetype_manual(values=c(3,2,1))
 )
@@ -84,7 +123,21 @@ plot_longer <- function(data.df,long_cols){
     pull(factor) %>%
     unique()
   
-  plot.df$factor <- factor(plot.df$factor,levels=factor_names)
+  plot.df$factor <- factor(plot.df$factor,levels=factor_names,ordered=TRUE)
+  
+  max_factor <- plot.df$factor %>%
+    unique() %>%
+    max()
+  
+  dates.df <- plot.df[,c("location","value","factor","date.depth.cm","type")] %>%
+    filter(factor==max_factor)
+  
+  dates.df$date.value <- dates.df %>%
+    filter(factor==max(factor_names)) %>%
+    pull(value) %>%
+    max()
+  
+  plot.df <- left_join(plot.df,dates.df)
   
   return (plot.df)
 }
@@ -125,7 +178,13 @@ ggsave("figures/isotopes.png",width=mywidth, height=myheight)
 
 temp.df <- plot_longer(iso.df,c("CN","NP","d15N.permil"))
 
+hline_factors <- temp.df$factor %>%
+  unique()
+
+hlines.df <- data.frame(factor=hline_factors,y=c(NA,16,NA))
+
 ggplot(temp.df)+
+  geom_hline(data=hlines.df,aes(yintercept=y),linetype="dashed")+
   mytheme
 
 ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
@@ -143,65 +202,16 @@ ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 # grainsize ---------------------------------------------------------------
 
-grain.df <- read_excel("data/grainsize_tidy.xlsx") %>%
-  select(-c(Replicate,Pseudoreplicate,Core)) %>%
-  group_by(Location,Depth) %>%
-  summarize_all(mean) %>%
-  pivot_longer(!c(Location,Depth),names_to="Micrometers",values_to="Percentage")
-
-grain.df$Location <- factor(grain.df$Location,levels=c("North","Middle","South"))
-
-grain.df$Micrometers <- as.numeric(grain.df$Micrometers)
-
-mysizes.df <- data.frame(as.numeric(unique(grain.df$Micrometers)))
-colnames(mysizes.df) <- c("Micrometers")
-
-size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt",
-                  "V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V.F. Gravel")
-
-grainsizes.df <- data.frame(size_classes,c(2,4,8,16,31,62,125,250,500,1000,2000,4000))
-colnames(grainsizes.df) <- c("Class","Micrometers")
-
-mypalette <- brewer.pal(n = length(size_classes), name = "RdYlBu")
-
-for (row in 1:nrow(mysizes.df)){
-  for (row2 in 1:nrow(grainsizes.df)){
-    if (mysizes.df[row,"Micrometers"]<grainsizes.df[row2,"Micrometers"]){
-      mysizes.df[row,"Class"] <- grainsizes.df[row2,"Class"]
-      break
-    }
-  }
-}
-
-grain.df <- left_join(grain.df,mysizes.df)
-
-grain.df$Class <- factor(grain.df$Class,levels=size_classes)
+colourCount = length(unique(grain.df$Class))
+getPalette = colorRampPalette(brewer.pal(10, "RdYlBu"))
 
 ggplot(grain.df, aes(x=Depth,y=Percentage, fill=Class))+
+  basetheme+
   geom_bar(position="fill",stat="identity",width=2)+
-  geom_hline(yintercept=0)+
-  geom_hline(yintercept=.25)+
-  geom_hline(yintercept=.5)+
-  geom_hline(yintercept=.75)+
-  geom_hline(yintercept=1)+
-  coord_flip()+
-  #scale_x_reverse(labels=function(x)2020-(x*3))+
-  scale_x_reverse()+
+  geom_hline(yintercept=c(0,0.25,0.5,0.75,1))+
   scale_y_continuous(labels=function(y)y*100)+
   facet_wrap(~Location)+
   xlab("Depth\n(cm)")+
-  theme(
-    text=element_text(size=12),
-    strip.background = element_blank(),
-    strip.placement = "outside",
-    panel.grid.major.x = element_blank(), 
-    panel.grid.major.y = element_blank(),
-    strip.text.y.left = element_text(angle = 0,size=12),
-    strip.text.x.top = element_text(size=12),
-    axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
-    axis.text.x = element_text(colour = "black"),
-    axis.text.y = element_text(colour = "black"),
-    legend.position = "right")+
-  scale_fill_brewer(palette="RdYlBu")
+  scale_fill_manual(values = getPalette(colourCount))
 
 ggsave("figures/grainsize.png",width=mywidth, height=myheight)

@@ -1,0 +1,41 @@
+rm(list = ls()) #clear environment
+
+library(tidyverse)
+library(readxl)
+library(progress)
+library(RColorBrewer)
+library(ggsci)
+
+grain.df <- read_excel("data/grainsize_tidy.xlsx") %>%
+  select(-c(Replicate,Pseudoreplicate,Core)) %>%
+  group_by(Location,Depth) %>%
+  summarize_all(mean) %>%
+  pivot_longer(!c(Location,Depth),names_to="Micrometers",values_to="Percentage")
+
+grain.df$Location <- factor(grain.df$Location,levels=c("North","Middle","South"))
+
+grain.df$Micrometers <- as.numeric(grain.df$Micrometers)
+
+mysizes.df <- data.frame(as.numeric(unique(grain.df$Micrometers)))
+colnames(mysizes.df) <- c("Micrometers")
+
+size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt",
+                  "V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V.F. Gravel")
+
+grainsizes.df <- data.frame(size_classes,c(2,4,8,16,31,62,125,250,500,1000,2000,4000))
+colnames(grainsizes.df) <- c("Class","Micrometers")
+
+for (row in 1:nrow(mysizes.df)){
+  for (row2 in 1:nrow(grainsizes.df)){
+    if (mysizes.df[row,"Micrometers"]<grainsizes.df[row2,"Micrometers"]){
+      mysizes.df[row,"Class"] <- grainsizes.df[row2,"Class"]
+      break
+    }
+  }
+}
+
+grain.df <- left_join(grain.df,mysizes.df)
+
+grain.df$Class <- factor(grain.df$Class,levels=size_classes)
+
+save(grain.df,file="Rdata/grainsize.Rdata")

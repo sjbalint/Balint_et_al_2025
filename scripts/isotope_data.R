@@ -7,7 +7,10 @@ library(readxl)
 
 # import data -------------------------------------------------------------
 
-load("Rdata/dates.Rdata")
+dates.df <- read_csv("data/core_dating_2.csv", show_col_types=FALSE) %>%
+  mutate_if(is.character,as.factor)
+
+dates.df$date.depth.cm <- dates.df$depth.cm
 
 mydata.df <- read_excel("data/isotopes_09072022.xlsx") %>%
   filter(ignore==FALSE) %>%
