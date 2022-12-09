@@ -1,0 +1,650 @@
+--------------------------------------------------------------------------------
+Codebook for NHGIS data file 'nhgis0002_ts_nominal_tract'
+--------------------------------------------------------------------------------
+ 
+Contents
+    - Data Summary
+    - Data Dictionary
+    - Geographic Integration Methods
+    - Source Data
+    - Citation and Use
+ 
+Detailed notes on time series design and comparability are available at: 
+    https://www.nhgis.org/sites/www.nhgis.org/files/nhgis_time_series_tables.pdf 
+ 
+--------------------------------------------------------------------------------
+Data Summary
+--------------------------------------------------------------------------------
+ 
+Time series layout:     Time varies by row
+Geographic level:       Census Tract (by State--County)
+Geographic integration: Nominal
+Measurement times:      1970, 1980, 1990, 2000, 2008-2012, 2015-2019
+ 
+Tables:
+ 
+1. Persons of Marrying Age* by Sex [2] by Marital Status [6]
+   Valid years in file: 1970, 1980, 1990, 2000, 2008-2012, 2015-2019
+   Code: BL1
+ 
+--------------------------------------------------------------------------------
+Data Dictionary
+--------------------------------------------------------------------------------
+ 
+Context Fields 
+        NHGISCODE:   NHGIS Integrated Geographic Unit Code
+        GISJOIN:     Year-Specific GIS Join Match Code
+        YEAR:        Row Source Year
+        STATE:       NHGIS Integrated State Name
+        STATEFP:     FIPS State Code
+        STATENH:     NHGIS Integrated State Code
+        COUNTY:      NHGIS Integrated County Name
+        COUNTYFP:    FIPS County Code
+        COUNTYNH:    NHGIS Integrated County Code
+        TRACTA:      NHGIS Integrated Census Tract Code
+        NAME:        Year-Specific Area Name
+ 
+Table 1: (BL1) Persons of Marrying Age* by Sex [2] by Marital Status [6]
+        BL1AA:       Persons: Male ~ Never married
+        BL1AB:       Persons: Male ~ Now married
+        BL1AC:       Persons: Male ~ Now married--Not separated
+        BL1AD:       Persons: Male ~ Now married--Separated
+        BL1AE:       Persons: Male ~ Widowed
+        BL1AF:       Persons: Male ~ Divorced
+        BL1AG:       Persons: Female ~ Never married
+        BL1AH:       Persons: Female ~ Now married
+        BL1AI:       Persons: Female ~ Now married--Not separated
+        BL1AJ:       Persons: Female ~ Now married--Separated
+        BL1AK:       Persons: Female ~ Widowed
+        BL1AL:       Persons: Female ~ Divorced
+ 
+Margins of Error 
+(Provided for American Community Survey data only) 
+        BL1AAM:      Margin of error: Persons: Male ~ Never married
+        BL1ABM:      Margin of error: Persons: Male ~ Now married
+        BL1ACM:      Margin of error: Persons: Male ~ Now married--Not separated
+        BL1ADM:      Margin of error: Persons: Male ~ Now married--Separated
+        BL1AEM:      Margin of error: Persons: Male ~ Widowed
+        BL1AFM:      Margin of error: Persons: Male ~ Divorced
+        BL1AGM:      Margin of error: Persons: Female ~ Never married
+        BL1AHM:      Margin of error: Persons: Female ~ Now married
+        BL1AIM:      Margin of error: Persons: Female ~ Now married--Not separated
+        BL1AJM:      Margin of error: Persons: Female ~ Now married--Separated
+        BL1AKM:      Margin of error: Persons: Female ~ Widowed
+        BL1ALM:      Margin of error: Persons: Female ~ Divorced
+ 
+--------------------------------------------------------------------------------
+Geographic Integration Methods
+--------------------------------------------------------------------------------
+ 
+Nominal Integration:
+
+    Nominally integrated tables link geographic units across time according to
+    their names and codes, disregarding any changes in unit boundaries. The
+    identified geographic units match those from each census source, so the
+    spatial definitions and total number of units may vary from one time to
+    another (e.g., a city may annex land, a tract may be split in two, a new
+    county may be created, etc.). The tables include data for a particular
+    geographic unit only at times when the unit's name or code was in use,
+    resulting in truncated time series for some areas.
+    
+    Users should be cautious when interpreting changes in nominally integrated
+    time series because a single unit code may refer to distinctly different
+    areas at different times. If you are uncertain whether any boundaries
+    changed in your areas of interest, we recommend inspecting NHGIS GIS files
+    to confirm. (NHGIS supplies GIS boundary files for all units and years in
+    nominally integrated time series *except* 1970 places and county
+    subdivisions.)
+    
+    Alternatively, for some topics and time periods, NHGIS provides
+    "geographically standardized" time series, which provide data from multiple
+    times for a single census's geographic units (e.g., 2000 and 2010 data for
+    2010 census units). A disadvantage of standardized time series is that, in
+    areas where source units do not nest perfectly within a unit of the standard
+    year (e.g., where a source 2000 unit intersects multiple 2010 units), NHGIS
+    applies interpolation to standardize the data, a process which may
+    occasionally produce substantial errors.
+
+Complete documentation on time series integration methods is available at:
+    https://www.nhgis.org/documentation/time-series
+ 
+--------------------------------------------------------------------------------
+Source Data
+--------------------------------------------------------------------------------
+ 
+Additional documentation on NHGIS data sources is available at:
+    https://www.nhgis.org/documentation/tabular-data
+
+Table 1: (BL1) Persons of Marrying Age* by Sex [2] by Marital Status [6]
+ 
+    Time series AA: Persons: Male ~ Never married
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII005] Male >> 14-19 years >> Never married
+                        Variable: [CII010] Male >> 20-24 years >> Never married
+                        Variable: [CII015] Male >> 25-34 years >> Never married
+                        Variable: [CII020] Male >> 35-44 years >> Never married
+                        Variable: [CII025] Male >> 45-54 years >> Never married
+                        Variable: [CII030] Male >> 55-64 years >> Never married
+                        Variable: [CII035] Male >> 65 years and over >> Never married
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F001] Male >> Single
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6001] Male >> Never married
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ001] Male >> Never married
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE003] Male: Never married
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2003] Male: Never married
+ 
+    Time series AB: Persons: Male ~ Now married
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII001] Male >> 14-19 years >> Now married (excludes separated)
+                        Variable: [CII004] Male >> 14-19 years >> Separated
+                        Variable: [CII006] Male >> 20-24 years >> Now married (excludes separated)
+                        Variable: [CII009] Male >> 20-24 years >> Separated
+                        Variable: [CII011] Male >> 25-34 years >> Now married (excludes separated)
+                        Variable: [CII014] Male >> 25-34 years >> Separated
+                        Variable: [CII016] Male >> 35-44 years >> Now married (excludes separated)
+                        Variable: [CII019] Male >> 35-44 years >> Separated
+                        Variable: [CII021] Male >> 45-54 years >> Now married (excludes separated)
+                        Variable: [CII024] Male >> 45-54 years >> Separated
+                        Variable: [CII026] Male >> 55-64 years >> Now married (excludes separated)
+                        Variable: [CII029] Male >> 55-64 years >> Separated
+                        Variable: [CII031] Male >> 65 years and over >> Now married (excludes separated)
+                        Variable: [CII034] Male >> 65 years and over >> Separated
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F002] Male >> Now married, except separated
+                        Variable: [C7F003] Male >> Separated
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6002] Male >> Now married, except separated
+                        Variable: [ET6003] Male >> Separated
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ002] Male >> Now married
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE004] Male: Now married
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2004] Male: Now married
+ 
+    Time series AC: Persons: Male ~ Now married--Not separated
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII001] Male >> 14-19 years >> Now married (excludes separated)
+                        Variable: [CII006] Male >> 20-24 years >> Now married (excludes separated)
+                        Variable: [CII011] Male >> 25-34 years >> Now married (excludes separated)
+                        Variable: [CII016] Male >> 35-44 years >> Now married (excludes separated)
+                        Variable: [CII021] Male >> 45-54 years >> Now married (excludes separated)
+                        Variable: [CII026] Male >> 55-64 years >> Now married (excludes separated)
+                        Variable: [CII031] Male >> 65 years and over >> Now married (excludes separated)
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F002] Male >> Now married, except separated
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6002] Male >> Now married, except separated
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018D. Population 15 Years and Over Now Married by Sex by Now Married Marital Status
+                    Universe: Persons 15 Years and Over Now Married
+                        Variable: [GI0001] Male >> Married, spouse present
+                Source table: NP018E. Population 15 Years and Over Now Married with Spouse Absent by Sex by Spouse Absent Type
+                    Universe: Persons 15 Years and Over Now Married with Spouse Absent
+                        Variable: [GI1002] Male >> Other
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE005] Male: Now married: Married, spouse present
+                        Variable: [QUE008] Male: Now married: Married, spouse absent: Other
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2005] Male: Now married: Married, spouse present
+                        Variable: [ALV2008] Male: Now married: Married, spouse absent: Other
+ 
+    Time series AD: Persons: Male ~ Now married--Separated
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII004] Male >> 14-19 years >> Separated
+                        Variable: [CII009] Male >> 20-24 years >> Separated
+                        Variable: [CII014] Male >> 25-34 years >> Separated
+                        Variable: [CII019] Male >> 35-44 years >> Separated
+                        Variable: [CII024] Male >> 45-54 years >> Separated
+                        Variable: [CII029] Male >> 55-64 years >> Separated
+                        Variable: [CII034] Male >> 65 years and over >> Separated
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F003] Male >> Separated
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6003] Male >> Separated
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018E. Population 15 Years and Over Now Married with Spouse Absent by Sex by Spouse Absent Type
+                    Universe: Persons 15 Years and Over Now Married with Spouse Absent
+                        Variable: [GI1001] Male >> Separated
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE007] Male: Now married: Married, spouse absent: Separated
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2007] Male: Now married: Married, spouse absent: Separated
+ 
+    Time series AE: Persons: Male ~ Widowed
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII002] Male >> 14-19 years >> Widowed
+                        Variable: [CII007] Male >> 20-24 years >> Widowed
+                        Variable: [CII012] Male >> 25-34 years >> Widowed
+                        Variable: [CII017] Male >> 35-44 years >> Widowed
+                        Variable: [CII022] Male >> 45-54 years >> Widowed
+                        Variable: [CII027] Male >> 55-64 years >> Widowed
+                        Variable: [CII032] Male >> 65 years and over >> Widowed
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F004] Male >> Widowed
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6004] Male >> Widowed
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ003] Male >> Widowed
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE009] Male: Widowed
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2009] Male: Widowed
+ 
+    Time series AF: Persons: Male ~ Divorced
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII003] Male >> 14-19 years >> Divorced
+                        Variable: [CII008] Male >> 20-24 years >> Divorced
+                        Variable: [CII013] Male >> 25-34 years >> Divorced
+                        Variable: [CII018] Male >> 35-44 years >> Divorced
+                        Variable: [CII023] Male >> 45-54 years >> Divorced
+                        Variable: [CII028] Male >> 55-64 years >> Divorced
+                        Variable: [CII033] Male >> 65 years and over >> Divorced
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F005] Male >> Divorced
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6005] Male >> Divorced
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ004] Male >> Divorced
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE010] Male: Divorced
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2010] Male: Divorced
+ 
+    Time series AG: Persons: Female ~ Never married
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII040] Female >> 14-19 years >> Never married
+                        Variable: [CII045] Female >> 20-24 years >> Never married
+                        Variable: [CII050] Female >> 25-34 years >> Never married
+                        Variable: [CII055] Female >> 35-44 years >> Never married
+                        Variable: [CII060] Female >> 45-54 years >> Never married
+                        Variable: [CII065] Female >> 55-64 years >> Never married
+                        Variable: [CII070] Female >> 65 years and over >> Never married
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F006] Female >> Single
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6006] Female >> Never married
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ005] Female >> Never married
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE012] Female: Never married
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2012] Female: Never married
+ 
+    Time series AH: Persons: Female ~ Now married
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII036] Female >> 14-19 years >> Now married (excludes separated)
+                        Variable: [CII039] Female >> 14-19 years >> Separated
+                        Variable: [CII041] Female >> 20-24 years >> Now married (excludes separated)
+                        Variable: [CII044] Female >> 20-24 years >> Separated
+                        Variable: [CII046] Female >> 25-34 years >> Now married (excludes separated)
+                        Variable: [CII049] Female >> 25-34 years >> Separated
+                        Variable: [CII051] Female >> 35-44 years >> Now married (excludes separated)
+                        Variable: [CII054] Female >> 35-44 years >> Separated
+                        Variable: [CII056] Female >> 45-54 years >> Now married (excludes separated)
+                        Variable: [CII059] Female >> 45-54 years >> Separated
+                        Variable: [CII061] Female >> 55-64 years >> Now married (excludes separated)
+                        Variable: [CII064] Female >> 55-64 years >> Separated
+                        Variable: [CII066] Female >> 65 years and over >> Now married (excludes separated)
+                        Variable: [CII069] Female >> 65 years and over >> Separated
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F007] Female >> Now married, except separated
+                        Variable: [C7F008] Female >> Separated
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6007] Female >> Now married, except separated
+                        Variable: [ET6008] Female >> Separated
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ006] Female >> Now married
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE013] Female: Now married
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2013] Female: Now married
+ 
+    Time series AI: Persons: Female ~ Now married--Not separated
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII036] Female >> 14-19 years >> Now married (excludes separated)
+                        Variable: [CII041] Female >> 20-24 years >> Now married (excludes separated)
+                        Variable: [CII046] Female >> 25-34 years >> Now married (excludes separated)
+                        Variable: [CII051] Female >> 35-44 years >> Now married (excludes separated)
+                        Variable: [CII056] Female >> 45-54 years >> Now married (excludes separated)
+                        Variable: [CII061] Female >> 55-64 years >> Now married (excludes separated)
+                        Variable: [CII066] Female >> 65 years and over >> Now married (excludes separated)
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F007] Female >> Now married, except separated
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6007] Female >> Now married, except separated
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018D. Population 15 Years and Over Now Married by Sex by Now Married Marital Status
+                    Universe: Persons 15 Years and Over Now Married
+                        Variable: [GI0003] Female >> Married, spouse present
+                Source table: NP018E. Population 15 Years and Over Now Married with Spouse Absent by Sex by Spouse Absent Type
+                    Universe: Persons 15 Years and Over Now Married with Spouse Absent
+                        Variable: [GI1004] Female >> Other
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE014] Female: Now married: Married, spouse present
+                        Variable: [QUE017] Female: Now married: Married, spouse absent: Other
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2014] Female: Now married: Married, spouse present
+                        Variable: [ALV2017] Female: Now married: Married, spouse absent: Other
+ 
+    Time series AJ: Persons: Female ~ Now married--Separated
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII039] Female >> 14-19 years >> Separated
+                        Variable: [CII044] Female >> 20-24 years >> Separated
+                        Variable: [CII049] Female >> 25-34 years >> Separated
+                        Variable: [CII054] Female >> 35-44 years >> Separated
+                        Variable: [CII059] Female >> 45-54 years >> Separated
+                        Variable: [CII064] Female >> 55-64 years >> Separated
+                        Variable: [CII069] Female >> 65 years and over >> Separated
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F008] Female >> Separated
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6008] Female >> Separated
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018E. Population 15 Years and Over Now Married with Spouse Absent by Sex by Spouse Absent Type
+                    Universe: Persons 15 Years and Over Now Married with Spouse Absent
+                        Variable: [GI1003] Female >> Separated
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE016] Female: Now married: Married, spouse absent: Separated
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2016] Female: Now married: Married, spouse absent: Separated
+ 
+    Time series AK: Persons: Female ~ Widowed
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII037] Female >> 14-19 years >> Widowed
+                        Variable: [CII042] Female >> 20-24 years >> Widowed
+                        Variable: [CII047] Female >> 25-34 years >> Widowed
+                        Variable: [CII052] Female >> 35-44 years >> Widowed
+                        Variable: [CII057] Female >> 45-54 years >> Widowed
+                        Variable: [CII062] Female >> 55-64 years >> Widowed
+                        Variable: [CII067] Female >> 65 years and over >> Widowed
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F009] Female >> Widowed
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6009] Female >> Widowed
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ007] Female >> Widowed
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE018] Female: Widowed
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2018] Female: Widowed
+ 
+    Time series AL: Persons: Female ~ Divorced
+        Year: 1970
+            Source dataset: 1970 Census: Count 2 - 100% Data [Tracts, Urban Areas, Metro Areas, etc.] 
+                Source table: NT5A. Sex by Age by Marital Status
+                    Universe: Persons 14 Years and Over
+                        Variable: [CII038] Female >> 14-19 years >> Divorced
+                        Variable: [CII043] Female >> 20-24 years >> Divorced
+                        Variable: [CII048] Female >> 25-34 years >> Divorced
+                        Variable: [CII053] Female >> 35-44 years >> Divorced
+                        Variable: [CII058] Female >> 45-54 years >> Divorced
+                        Variable: [CII063] Female >> 55-64 years >> Divorced
+                        Variable: [CII068] Female >> 65 years and over >> Divorced
+        Year: 1980
+            Source dataset: 1980 Census: STF 1 - 100% Data
+                Source table: NT14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [C7F010] Female >> Divorced
+        Year: 1990
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP14. Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [ET6010] Female >> Divorced
+        Year: 2000
+            Source dataset: 2000 Census: SF 3a - Sample-Based Data [Areas Larger Than Block Groups]
+                Source table: NP018C. Population 15 Years and Over by Sex by Marital Status
+                    Universe: Persons 15 Years and Over
+                        Variable: [GIZ008] Female >> Divorced
+        Year: 2008-2012
+            Source dataset: 2012 American Community Survey: 5-Year Data [2008-2012, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [QUE019] Female: Divorced
+        Year: 2015-2019
+            Source dataset: 2019 American Community Survey: 5-Year Data [2015-2019, Block Groups & Larger Areas]
+                Source table: B12001. Sex by Marital Status for the Population 15 Years and Over
+                    Universe: Population 15 years and over
+                        Variable: [ALV2019] Female: Divorced
+ 
+--------------------------------------------------------------------------------
+Citation and Use of NHGIS Data
+--------------------------------------------------------------------------------
+ 
+All persons are granted a limited license to use this documentation and the
+accompanying data, subject to the following conditions:
+
+* REDISTRIBUTION: You will not redistribute the data without permission.
+
+  You may publish a subset of the data to meet journal requirements for accessing 
+  data related to a particular publication. Contact us for permission for any other 
+  redistribution; we will consider requests for free and commercial redistribution.
+
+* CITATION: You will cite NHGIS appropriately.
+
+    * Publications and research reports employing NHGIS data (either tabular or GIS) 
+      should include the following citation:
+
+        Steven Manson, Jonathan Schroeder, David Van Riper, Tracy Kugler, and Steven Ruggles. 
+        IPUMS National Historical Geographic Information System: Version 17.0 
+        [dataset]. Minneapolis, MN: IPUMS. 2022. 
+        http://doi.org/10.18128/D050.V17.0
+
+    * For policy briefs, online resources, or articles in the popular press, we 
+      recommend that you cite the use of NHGIS data as follows:
+
+        IPUMS NHGIS, University of Minnesota, www.nhgis.org.
+
+These terms of use are a legally binding agreement. You can use the data only in 
+accordance with these terms, and any other use is a violation of the agreement. 
+Violations may result in revocation of the agreement and prohibition from using other 
+IPUMS data. If IPUMS or our partners are harmed from your violation, you are 
+responsible for all damages, including reasonable attorney's fees and expenses.
+        
+In addition, we request that users send us a copy of any publications, research
+reports, or educational material making use of the data or documentation.
+
+Send electronic material to: nhgis@umn.edu
+
+Printed matter should be sent to:
+
+    IPUMS NHGIS
+    Institute for Social Research and Data Innovation
+    University of Minnesota
+    50 Willey Hall
+    225 19th Ave S
+    Minneapolis, MN 55455

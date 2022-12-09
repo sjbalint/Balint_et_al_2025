@@ -190,6 +190,21 @@ ggplot(temp.df)+
 ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
 
 
+
+temp.df <- plot_longer(iso.df,c("CN","NP"))
+
+hline_factors <- temp.df$factor %>%
+  unique()
+
+hlines.df <- data.frame(factor=hline_factors,y=c(NA,16))
+
+ggplot(temp.df)+
+  geom_hline(data=hlines.df,aes(yintercept=y),linetype="dashed")+
+  mytheme
+
+ggsave("figures/element_ratios_2.png",width=mywidth, height=myheight)
+
+
 # elemental composition again ---------------------------------------------
 
 temp.df <- plot_longer(iso.df,c("%C.organic","%N","P.total"))
