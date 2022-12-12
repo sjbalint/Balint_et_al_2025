@@ -64,7 +64,7 @@ save(population.df,file="Rdata/population.Rdata")
 theme_set(theme_classic())
 
 ggplot(population.df,aes(Year,Population.Thousand,fill=Region))+
-  geom_col(color="black",position=position_dodge(width=1))+
+  geom_area(stat ="bin")+
   labs(y=bquote("Population"~10^3))+
   scale_fill_grey()
 

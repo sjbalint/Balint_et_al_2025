@@ -14,40 +14,7 @@ library(ggsci)
 
 load("Rdata/iso.Rdata")
 
-load("Rdata/grainsize.Rdata")
-
-# depth shift -------------------------------------------------------------
-
-date_shift <- TRUE
-
-if (date_shift==TRUE){
-  for (row in 1:nrow(iso.df)){
-    if (iso.df[row,"location"]=="South"){
-      iso.df[row,"depth.cm"] <- iso.df[row,"depth.cm"]+12
-      iso.df[row,"date.depth.cm"] <- iso.df[row,"date.depth.cm"]+12
-    }
-    if (iso.df[row,"location"]=="North"){
-      iso.df[row,"depth.cm"] <- iso.df[row,"depth.cm"]+4
-      iso.df[row,"date.depth.cm"] <- iso.df[row,"date.depth.cm"]+4
-    }
-  }
-}
-
-if (date_shift==TRUE){
-  for (row in 1:nrow(grain.df)){
-    if (grain.df[row,"Location"]=="South"){
-      grain.df[row,"Depth"] <- grain.df[row,"Depth"]+12
-    }
-    if (grain.df[row,"Location"]=="North"){
-      grain.df[row,"Depth"] <- grain.df[row,"Depth"]+4
-    }
-  }
-}
-
-
 # graphing parameters -----------------------------------------------------
-
-theme_set(theme_classic())
 
 mywidth=9
 myheight=6
@@ -55,6 +22,7 @@ myheight=6
 legend_title <- NULL
 
 basetheme <- list(
+  theme_classic(),
   coord_flip(),
   scale_x_reverse(),
   theme(
@@ -92,7 +60,7 @@ mytheme <- list(
 
 ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
                                 'd13C.total',"%C.organic",'d13C.organic',"n","P.inorg",
-                                "P.total", "P.org","NP","CN"),
+                                "P.total", "P.org","NP","CN","SiO2.prct"),
                          factor=as.character(
                            c(
                              bquote("Location"),
@@ -108,7 +76,8 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote(P[Total]~x~10^-2~'(%)'),
                              bquote("%"*P[organic]),
                              bquote("N:P"~"Ratio"),
-                             bquote("C:N"~"Ratio")
+                             bquote("C:N"~"Ratio"),
+                             bquote("Si"*O[2]~"(%)")
                             )
 )
 )
@@ -215,18 +184,18 @@ ggplot(temp.df)+
 ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 
-# grainsize ---------------------------------------------------------------
+# silica ------------------------------------------------------------------
 
-colourCount = length(unique(grain.df$Class))
-getPalette = colorRampPalette(brewer.pal(10, "RdYlBu"))
+temp.df <- plot_longer(iso.df,c("SiO2.prct","NP","d15N.permil"))
 
-ggplot(grain.df, aes(x=Depth,y=Percentage, fill=Class))+
-  basetheme+
-  geom_bar(position="fill",stat="identity",width=2)+
-  geom_hline(yintercept=c(0,0.25,0.5,0.75,1))+
-  scale_y_continuous(labels=function(y)y*100)+
-  facet_wrap(~Location)+
-  xlab("Depth\n(cm)")+
-  scale_fill_manual(values = getPalette(colourCount))
+hline_factors <- temp.df$factor %>%
+  unique()
 
-ggsave("figures/grainsize.png",width=mywidth, height=myheight)
+hlines.df <- data.frame(factor=hline_factors,y=c(NA,16,NA))
+
+ggplot(temp.df)+
+  geom_hline(data=hlines.df,aes(yintercept=y),linetype="dashed")+
+  mytheme+
+  labs(title="PRELIMINARY DATA")
+
+ggsave("figures/silica.png",width=mywidth, height=myheight)

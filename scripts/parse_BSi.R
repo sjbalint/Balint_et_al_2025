@@ -3,74 +3,99 @@ rm(list = ls()) #clear environment
 # import packages ---------------------------------------------------------
 
 library(tidyverse)
+library(readxl)
+library(stringr)
 
-dat <- read.csv("C:/Users/Melissa Hagy/CCASE/CCASE_SedimentSi.csv")
+# import data -------------------------------------------------------------
 
-#separate data into levels based on sample ID
-lvl_ID<- unique(dat$ID)
+weights.df <- read_excel("raw/silica/BSi_weights.xlsx") #weights
 
-#Create a dataframe for the p-value, R2, slope, intercept. 
-#Start by making vectors for each column.
+seal.df <- read.csv("raw/silica/silica_12092022.csv") %>% #data from SEAL
+  select(c("Sample.ID","SiO2.uM")) %>%
+  group_by(Sample.ID) %>%
+  summarize_all(mean) %>%
+  ungroup()
 
-#taking unique ID's and put in a dataframe to automatically dimension the dataframe 
-#so it doesn't matter how many samples
-#and create empty variables for p, r2 and intercept
-CCASE_BSi <- data.frame(lvl_ID) %>% 
-  mutate(
-    p=NA,R2=NA,intercept=NA,slope=NA,averageBsi=NA
-  )
 
-#for loop
-for ( i in 1:nrow(CCASE_BSi) ){
-  #create a subset data 
-  data_sub <- filter(dat,ID== CCASE_BSi$lvl_ID[i])
-  #recode time variable to always start with 0 so intercept is calulated back to first time point
-  mintime <- min(data_sub$Time)
-  data_sub <- data_sub %>% mutate(Time=Time-mintime)
+# parse sample ID ---------------------------------------------------------
+
+seal.df$id <- str_sub(seal.df$Sample.ID,0,-2) %>% #return numeric sample identifier
+  as.numeric()
+
+seal.df$time <- str_sub(seal.df$Sample.ID,start=-1) #return letter time indentifier
+
+#convert letter time indentifier to number of hours
+seal.df$time.hr <- factor(seal.df$time,levels=c("A","B","C"), labels=c(3,4,5)) %>%
+  as.numeric()
+
+silica.df <- left_join(seal.df,weights.df)
+  #drop_na(replicate)
+
+
+# calculate percent SiO ---------------------------------------------------
+
+silica.df$SiO2.mg <- silica.df$SiO2.uM * 60.08 * 0.04 * 10 * 0.1
+
+silica.df$SiO2.prct <- silica.df$SiO2.mg/silica.df$final.mg
+
+silica.df <- silica.df %>%
+  select(c("id","time.hr","replicate","location","depth.cm","SiO2.prct"))
+
+
+# linear regression -------------------------------------------------------
+
+id.list <- silica.df %>% #create list of sample ids
+  pull(id) %>%
+  unique()
+
+results.list <- list()
+
+for (myid in id.list){
+  temp.df <- silica.df %>%
+    filter(id==myid)
+  #recode time variable to always start with 0 so intercept is calculated back to first time point
+  #mintime <- min(temp.df$time.hr)
+  #temp.df <- temp.df %>% 
+   # mutate(time.hr=time.hr-mintime) %>%
+    #data.frame()
   
-  #create the linear model. If it is the first loop,
-  #then the model name will be lm1
-  lm.Bsi <- lm(Wtperc_Bsi~Time,data=data_sub)
+  #make linear model
+  lm.Bsi <- lm(SiO2.prct~time.hr,temp.df)
   intercept <- coefficients(lm.Bsi) %>% .[1]
   slope <- coefficients(lm.Bsi) %>% .[2]
   R2 <- summary(lm.Bsi)$r.squared 
   p <- summary(lm.Bsi)$coefficients[2,4]
-  averageBsi <- mean(data_sub$Wtperc_Bsi)
-  CCASE_BSi[i, 2:6] <- c(p, R2, intercept,slope,averageBsi)
+  mean.SiO2.prct <- mean(temp.df$SiO2.prct)
+  
+  temp.df$intercept <- intercept
+  temp.df$slope <- slope
+  temp.df$R2 <- R2
+  temp.df$P <- p
+  
+  if(p<=0.05 & R2>=0.65){
+    temp.df$extrapolate <- TRUE
+    temp.df$SiO2.prct <- intercept
+  } else {
+    temp.df$extrapolate <- FALSE
+    temp.df$SiO2.prct <- mean.SiO2.prct
+  }
+  
+  temp.df <- temp.df %>%
+    select(-c(time.hr)) %>%
+    unique()
+  
+  results.list <- c(list(temp.df),results.list)
   
 }
-#calculate BSi based on (p ??? 0.05, R2 ??? 0.65) less than extrapolate to intercept otherwise average
-#by creating true or false (logical) variable
-CCASE_BSi <- CCASE_BSi %>% 
-  mutate(extrapolate=(p<=0.1 & R2>=0.65 & slope >0 ))
-#If conditions for extrapolation are met, extrapolate to intercept
-CCASE_BSi$Bsi[CCASE_BSi$extrapolate] <- CCASE_BSi$intercept[CCASE_BSi$extrapolate]
-#! means not or negation (no extrapolate use averae)
-CCASE_BSi$Bsi[!CCASE_BSi$extrapolate] <- CCASE_BSi$averageBsi[!CCASE_BSi$extrapolate]
-# 
-# pdf(file="C:/Users/Melissa Hagy/CCASE/CCASESigraphs_facet.pdf",width=7,height=10,useDingbats = FALSE,paper="letter")
-# 
-# ggplot(dat,aes(x=Time,y=Wtperc_Bsi))+
-#   geom_point()+
-#   facet_wrap(~ID)+
-#   geom_smooth(method="lm")
-# 
-# dev.off()
 
-pdf(file="C:/Users/Melissa Hagy/CCASE/CCASESigraphs.pdf",width=4,height=4,useDingbats = FALSE,paper="letter")
-for (i in 1:nrow(CCASE_BSi)) {
-  lbl <- paste("R2=",round(CCASE_BSi$R2[i],2),"p=",round(CCASE_BSi$p[i],2),
-               "slope=",round(CCASE_BSi$slope[i],2))
-  data_sub <- subset(dat,ID== CCASE_BSi$lvl_ID[i])
-  plt <- ggplot(data=data_sub,aes(x=Time,y=Wtperc_Bsi))+
-    geom_point()+
-    theme_classic()+
-    geom_smooth(method="lm")+
-    ggtitle(paste("BSi Concentration, ID=",lvl_ID[i]),subtitle=lbl)
-  print(plt)
-}
-dev.off()
+#combine results into a dataframe
+results.df <- do.call("rbind",results.list)
 
-#Export the data into a CSV
-save(CCASE_BSi,file="Rdata/BSi.Rdata")
+silica.df <- results.df %>%
+  select(c("location","depth.cm","SiO2.prct")) %>%
+  group_by(location,depth.cm) %>%
+  summarize_all(mean) %>%
+  ungroup() %>%
+  drop_na(location)
 
+save(silica.df,file="Rdata/silica.Rdata")
