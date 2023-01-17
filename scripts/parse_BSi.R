@@ -8,13 +8,32 @@ library(stringr)
 
 # import data -------------------------------------------------------------
 
-weights.df <- read_excel("raw/silica/BSi_weights.xlsx") #weights
+filepath <- "raw/silica/01132023/"
 
-seal.df <- read.csv("raw/silica/silica_12092022.csv") %>% #data from SEAL
-  select(c("Sample.ID","SiO2.uM")) %>%
+weights.df <- read_excel(paste0(filepath,"BSi_weights.xlsx")) #weights
+
+#create a function to read each excel file
+read_SEAL <- function(filename){
+  print(paste("Importing",filename)) #print text so we can see what's happening
+  df <- read.csv(filename,skip=12) %>%
+  return(df) #return a dataframe
+}
+
+seal.df <- #new dataframe of our raw data
+  list.files(path = paste0(filepath,"seal/"),full.names=TRUE) %>% #list the filenames of every exceul document oin the folder
+  map_df(~read_SEAL(.)) %>% #create a big dataframe using our function
+  select((c("Sample.ID","Peak.Number","Cup.Type","Results.5","AD.Values")))
+
+colnames(seal.df) <- c("Sample.ID","peak","type","SiO2.uM","ad.values")
+
+seal.df <- seal.df %>%
+  mutate(across(c("type"),as.factor)) %>%
+  mutate(across(c("peak","SiO2.uM","ad.values"),as.numeric)) %>%
   group_by(Sample.ID) %>%
   summarize_all(mean) %>%
   ungroup()
+
+str(seal.df) #print the first 6 lines of our dataframe
 
 
 # parse sample ID ---------------------------------------------------------
@@ -45,6 +64,7 @@ silica.df <- silica.df %>%
 # linear regression -------------------------------------------------------
 
 id.list <- silica.df %>% #create list of sample ids
+  drop_na(c("id","depth.cm","SiO2.prct")) %>%
   pull(id) %>%
   unique()
 
@@ -61,23 +81,32 @@ for (myid in id.list){
   
   #make linear model
   lm.Bsi <- lm(SiO2.prct~time.hr,temp.df)
+  
   intercept <- coefficients(lm.Bsi) %>% .[1]
   slope <- coefficients(lm.Bsi) %>% .[2]
-  R2 <- summary(lm.Bsi)$r.squared 
-  p <- summary(lm.Bsi)$coefficients[2,4]
-  mean.SiO2.prct <- mean(temp.df$SiO2.prct)
   
   temp.df$intercept <- intercept
   temp.df$slope <- slope
-  temp.df$R2 <- R2
-  temp.df$P <- p
   
-  if(p<=0.05 & R2>=0.65){
-    temp.df$extrapolate <- TRUE
-    temp.df$SiO2.prct <- intercept
-  } else {
+  mean.SiO2.prct <- mean(temp.df$SiO2.prct,na.rm=TRUE)
+  
+  if (is.na(slope)){
+    temp.df$R2 <- NA
+    temp.df$P <- NA
     temp.df$extrapolate <- FALSE
     temp.df$SiO2.prct <- mean.SiO2.prct
+  } else {
+    R2 <- summary(lm.Bsi)$r.squared 
+    p <- summary(lm.Bsi)$coefficients[2,4]
+    temp.df$R2 <- R2
+    temp.df$P <- p
+    if(is.na(p)==FALSE & p<=0.05 & R2>=0.65){
+      temp.df$extrapolate <- TRUE
+      temp.df$SiO2.prct <- intercept
+    } else {
+      temp.df$extrapolate <- FALSE
+      temp.df$SiO2.prct <- mean.SiO2.prct
+    }
   }
   
   temp.df <- temp.df %>%

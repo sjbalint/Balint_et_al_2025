@@ -8,6 +8,9 @@ library(readxl)
 # import data -------------------------------------------------------------
 
 load("Rdata/silica.Rdata")
+load("Rdata/silica_2.Rdata")
+
+silica.df <- rbind(silica.df,silica2.df)
 
 dates.df <- read_csv("raw/core_dating_2.csv", show_col_types=FALSE) %>%
   mutate_if(is.character,as.factor)
@@ -69,6 +72,8 @@ iso.df <- left_join(iso.df,silica.df)
 iso.df$NP <- iso.df$`%N`/iso.df$P.total
 
 iso.df$CN <- iso.df$`%C.total`/iso.df$`%N`
+
+iso.df$SiP <- iso.df$SiO2.prct/iso.df$P.total
 
 iso.df$P.total <- iso.df$P.total*100
 

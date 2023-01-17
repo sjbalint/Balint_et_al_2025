@@ -60,7 +60,7 @@ mytheme <- list(
 
 ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
                                 'd13C.total',"%C.organic",'d13C.organic',"n","P.inorg",
-                                "P.total", "P.org","NP","CN","SiO2.prct"),
+                                "P.total", "P.org","NP","CN","SiO2.prct","SiP"),
                          factor=as.character(
                            c(
                              bquote("Location"),
@@ -77,7 +77,8 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("%"*P[organic]),
                              bquote("N:P"~"Ratio"),
                              bquote("C:N"~"Ratio"),
-                             bquote("Si"*O[2]~"(%)")
+                             bquote("Si"*O[2]~"(%)"),
+                             bquote("BSi:P"~"Ratio")
                             )
 )
 )
@@ -186,15 +187,9 @@ ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 # silica ------------------------------------------------------------------
 
-temp.df <- plot_longer(iso.df,c("SiO2.prct","NP","d15N.permil"))
-
-hline_factors <- temp.df$factor %>%
-  unique()
-
-hlines.df <- data.frame(factor=hline_factors,y=c(NA,16,NA))
+temp.df <- plot_longer(iso.df,c("SiO2.prct","SiP","d15N.permil"))
 
 ggplot(temp.df)+
-  geom_hline(data=hlines.df,aes(yintercept=y),linetype="dashed")+
   mytheme+
   labs(title="PRELIMINARY DATA")
 
