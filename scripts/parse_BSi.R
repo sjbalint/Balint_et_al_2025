@@ -9,6 +9,7 @@ library(stringr)
 # import data -------------------------------------------------------------
 
 filepath <- "raw/silica/01132023/"
+#filepath <- "raw/silica/12092022/"
 
 weights.df <- read_excel(paste0(filepath,"BSi_weights.xlsx")) #weights
 
@@ -26,11 +27,13 @@ seal.df <- #new dataframe of our raw data
 
 colnames(seal.df) <- c("Sample.ID","peak","type","SiO2.uM","ad.values")
 
+seal.df["SiO2.uM"][seal.df["SiO2.uM"] == "0"] <- NA
+
 seal.df <- seal.df %>%
   mutate(across(c("type"),as.factor)) %>%
   mutate(across(c("peak","SiO2.uM","ad.values"),as.numeric)) %>%
   group_by(Sample.ID) %>%
-  summarize_all(mean) %>%
+  summarize_all(mean,na.rm=TRUE) %>%
   ungroup()
 
 str(seal.df) #print the first 6 lines of our dataframe
@@ -45,6 +48,7 @@ seal.df$time <- str_sub(seal.df$Sample.ID,start=-1) #return letter time indentif
 
 #convert letter time indentifier to number of hours
 seal.df$time.hr <- factor(seal.df$time,levels=c("A","B","C"), labels=c(3,4,5)) %>%
+  as.character() %>%
   as.numeric()
 
 silica.df <- left_join(seal.df,weights.df)
@@ -58,7 +62,7 @@ silica.df$SiO2.mg <- silica.df$SiO2.uM * 60.08 * 0.04 * 10 * 0.1
 silica.df$SiO2.prct <- silica.df$SiO2.mg/silica.df$final.mg
 
 silica.df <- silica.df %>%
-  select(c("id","time.hr","replicate","location","depth.cm","SiO2.prct"))
+  select(c("id","time.hr","replicate","location","depth.cm","SiO2.mg","SiO2.prct"))
 
 
 # linear regression -------------------------------------------------------
@@ -121,7 +125,7 @@ for (myid in id.list){
 results.df <- do.call("rbind",results.list)
 
 silica.df <- results.df %>%
-  select(c("location","depth.cm","SiO2.prct")) %>%
+  select(c("location","depth.cm","SiO2.mg","SiO2.prct")) %>%
   group_by(location,depth.cm) %>%
   summarize_all(mean) %>%
   ungroup() %>%

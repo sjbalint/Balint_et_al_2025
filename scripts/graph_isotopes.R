@@ -190,7 +190,6 @@ ggsave("figures/elements.png",width=mywidth, height=myheight)
 temp.df <- plot_longer(iso.df,c("SiO2.prct","SiP","d15N.permil"))
 
 ggplot(temp.df)+
-  mytheme+
-  labs(title="PRELIMINARY DATA")
+  mytheme
 
 ggsave("figures/silica.png",width=mywidth, height=myheight)
