@@ -12,7 +12,7 @@ library(ggsci)
 
 # import data -------------------------------------------------------------
 
-load("Rdata/iso.Rdata")
+load("Rdata/compiled_data.Rdata")
 
 # graphing parameters -----------------------------------------------------
 
@@ -60,7 +60,7 @@ mytheme <- list(
 
 ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
                                 'd13C.total',"%C.organic",'d13C.organic',"n","P.inorg",
-                                "P.total", "P.org","NP","CN","SiO2.prct","SiP"),
+                                "P.total", "P.org","NP","CN","SiO2.prct","SiP","N.storage"),
                          factor=as.character(
                            c(
                              bquote("Location"),
@@ -78,7 +78,8 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("N:P"~"Ratio"),
                              bquote("C:N"~"Ratio"),
                              bquote("Si"*O[2]~"(%)"),
-                             bquote("BSi:P"~"Ratio")
+                             bquote("BSi:P"~"Ratio"),
+                             bquote("N"~"Accumulation"~"Rate")
                             )
 )
 )
@@ -115,7 +116,8 @@ plot_longer <- function(data.df,long_cols){
 
 # remove problamatic values -----------------------------------------------
 
-temp.df <- iso.df
+temp.df <- data.df %>%
+  filter(depth.cm!=0)
 
 for (row in 1:nrow(temp.df)){
   if (temp.df[row,"NP"]<0 | temp.df[row,"NP"]>40){
@@ -132,11 +134,11 @@ for (row in 1:nrow(temp.df)){
   }
 }
 
-iso.df <- temp.df
+data.df <- temp.df
 
 # plot isotopes -----------------------------------------------------------
 
-temp.df <- plot_longer(iso.df,c("d13C.organic","d15N.permil"))
+temp.df <- plot_longer(data.df,c("d13C.organic","d15N.permil"))
 
 ggplot(temp.df)+
   mytheme
@@ -146,7 +148,7 @@ ggsave("figures/isotopes.png",width=mywidth, height=myheight)
 
 # elemental ratios --------------------------------------------------------
 
-temp.df <- plot_longer(iso.df,c("CN","NP","d15N.permil"))
+temp.df <- plot_longer(data.df,c("CN","NP","d15N.permil"))
 
 hline_factors <- temp.df$factor %>%
   unique()
@@ -161,7 +163,7 @@ ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
 
 
 
-temp.df <- plot_longer(iso.df,c("CN","NP"))
+temp.df <- plot_longer(data.df,c("CN","NP"))
 
 hline_factors <- temp.df$factor %>%
   unique()
@@ -177,7 +179,7 @@ ggsave("figures/element_ratios_2.png",width=mywidth, height=myheight)
 
 # elemental composition again ---------------------------------------------
 
-temp.df <- plot_longer(iso.df,c("%C.organic","%N","P.total"))
+temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total"))
 
 ggplot(temp.df)+
   mytheme
@@ -187,9 +189,27 @@ ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 # silica ------------------------------------------------------------------
 
-temp.df <- plot_longer(iso.df,c("SiO2.prct","SiP","d15N.permil"))
+temp.df <- plot_longer(data.df,c("SiO2.prct","SiP","d15N.permil"))
 
 ggplot(temp.df)+
   mytheme
 
 ggsave("figures/silica.png",width=mywidth, height=myheight)
+
+temp.df <- plot_longer(data.df,c("SiO2.prct","SiP"))
+
+ggplot(temp.df)+
+  mytheme
+
+ggsave("figures/silica_2.png",width=mywidth, height=myheight)
+
+
+# N accumulation rates ----------------------------------------------------
+
+temp.df <- plot_longer(data.df,c("CN","N.storage","d15N.permil"))
+
+ggplot(temp.df)+
+  mytheme
+
+ggsave("figures/N_storage.png",width=mywidth, height=myheight)
+

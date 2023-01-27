@@ -11,23 +11,7 @@ library(dunn.test)
 
 # import data -------------------------------------------------------------
 
-iso.df <- read_excel("data/data_08232022.xlsx",sheet="isotopes") %>%
-  as.data.frame() %>%
-  mutate(across(location,as.factor)) %>%
-  mutate_if(is.character,as.numeric)
-
-P.df <- read_excel("data/data_08232022.xlsx",sheet="phosphorus") %>%
-  as.data.frame()
-
-data.df <- left_join(iso.df,P.df)
-
-data.df$NP <- data.df$`%N`/data.df$P.total
-
-data.df$CN <- data.df$`%C.total`/data.df$`%N`
-
-data.df$P.total <- data.df$P.total*100
-
-data.df$location <- factor(data.df$location,levels=c("North","Middle","South"))
+load("Rdata/compiled_data.Rdata")
 
 
 # create a date (depth) threshold -----------------------------------------
@@ -45,7 +29,7 @@ for (row in 1:nrow(data.df)){
 alpha=0.05
 
 predictor.list <- c("location","class")
-response.list <- c("%C.organic","%N","P.total","CN","NP","d15N.permil","d13C.organic")
+response.list <- c("%C.organic","%N","P.total","SiO2.prct","CN","NP","SiP","d15N.permil","d13C.organic")
 
 # test for normality ------------------------------------------------------
 

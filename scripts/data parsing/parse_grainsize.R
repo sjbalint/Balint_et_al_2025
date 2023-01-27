@@ -8,7 +8,7 @@ library(ggsci)
 
 date_shift <- TRUE
 
-grain.df <- read_excel("raw/grainsize_tidy.xlsx") %>%
+grain.df <- read_excel("raw/grainsize/grainsize_tidy.xlsx") %>%
   select(-c(Replicate,Pseudoreplicate,Core)) %>%
   group_by(Location,Depth) %>%
   summarize_all(mean) %>%
