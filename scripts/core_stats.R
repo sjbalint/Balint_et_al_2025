@@ -13,10 +13,34 @@ library(dunn.test)
 
 load("Rdata/compiled_data.Rdata")
 
+# remove problamatic values -----------------------------------------------
+
+temp.df <- data.df %>%
+  filter(depth.cm!=0)
+
+data.df <- temp.df
+
+for (row in 1:nrow(temp.df)){
+  if (temp.df[row,"NP"]<0 | temp.df[row,"NP"]>40){
+    temp.df[row,"NP"] <- NA
+  }
+  if (temp.df[row,"CN"]>40){
+    temp.df[row,"CN"] <- NA
+  }
+  if (is.na(temp.df[row,"%C.organic"])==FALSE & temp.df[row,"%C.organic"] >10){
+    temp.df[row,"%C.organic"] <- NA
+  }
+  if (is.na(temp.df[row,"%N"])==FALSE & temp.df[row,"%N"]>0.7){
+    temp.df[row,"%N"] <- NA
+  }
+}
+
+
+
 
 # create a date (depth) threshold -----------------------------------------
 
-threshold <- 20
+threshold <- 30
 
 for (row in 1:nrow(data.df)){
   ifelse(data.df[row,"depth.cm"]< threshold,
@@ -28,7 +52,7 @@ for (row in 1:nrow(data.df)){
 
 alpha=0.05
 
-predictor.list <- c("location","class")
+predictor.list <- c("location")
 response.list <- c("%C.organic","%N","P.total","SiO2.prct","CN","NP","SiP","d15N.permil","d13C.organic")
 
 # test for normality ------------------------------------------------------
@@ -99,34 +123,38 @@ if (length(normal.list)>0){
     filter(anova.significance==TRUE) %>%
     select(c("response","predictor"))
   
-  tukey.results.df <- tukey.df
-  
-  for (row in 1:nrow(tukey.df)){
-    response <- tukey.df[row,"response"]
-    predictor <- tukey.df[row,"predictor"]
-    thsd <- TukeyHSD(aov(data.df[,response] ~ data.df[,predictor]))
-    temp.df <- data.frame(dimnames(thsd$`data.df[, predictor]`)[1], thsd$`data.df[, predictor]`[4])
-    colnames(temp.df) <- c("comparison","tukey.p.value")
-    temp.df$response <- tukey.df[row,"response"]
-    temp.df$predictor <- tukey.df[row,"predictor"]
-    tukey.results.df <- full_join(tukey.results.df,temp.df)
-  }
-  
-  tukey.df <- tukey.results.df %>% 
-    drop_na(tukey.p.value)
-  
-  for (row in 1:nrow(tukey.df)){
-    if (tukey.df[row,"tukey.p.value"]<alpha/2){
-      tukey.df[row,"tukey.significance"] <- TRUE
-    } else {
-      tukey.df[row,"tukey.significance"] <- FALSE
+  if (nrow(tukey.df)>0){
+    tukey.results.df <- tukey.df
+    
+    for (row in 1:nrow(tukey.df)){
+      response <- tukey.df[row,"response"]
+      predictor <- tukey.df[row,"predictor"]
+      thsd <- TukeyHSD(aov(data.df[,response] ~ data.df[,predictor]))
+      kruskal.df[row,"predictor"] <- predictor
+      temp.df <- data.frame(dimnames(thsd$`data.df[, predictor]`)[1], thsd$`data.df[, predictor]`[4])
+      colnames(temp.df) <- c("comparison","tukey.p.value")
+      temp.df$response <- tukey.df[row,"response"]
+      temp.df$predictor <- tukey.df[row,"predictor"]
+      temp.df$tukey.n <- n
+      tukey.results.df <- full_join(tukey.results.df,temp.df)
     }
+    
+    tukey.df <- tukey.results.df %>% 
+      drop_na(tukey.p.value)
+    
+    for (row in 1:nrow(tukey.df)){
+      if (tukey.df[row,"tukey.p.value"]<alpha/2){
+        tukey.df[row,"tukey.significance"] <- TRUE
+      } else {
+        tukey.df[row,"tukey.significance"] <- FALSE
+      }
+    }
+    
+    tukey.results.df <- tukey.df %>%
+      filter(tukey.significance==TRUE)
+    
+    kable(tukey.results.df) 
   }
-  
-  tukey.results.df <- tukey.df %>%
-    filter(tukey.significance==TRUE)
-  
-  kable(tukey.results.df)
 }
 
 # abnormal data -----------------------------------------------------------
@@ -142,8 +170,14 @@ if (length(abnormal.list)>0){
   for (response in response.list){
     for (predictor in predictor.list){
       row <- row+1
+      n <- data.df %>%
+        select(c("depth.cm",response)) %>%
+        drop_na() %>%
+        count() %>%
+        as.numeric()
       kruskal.df[row,"response"] <- response
       kruskal.df[row,"predictor"] <- predictor
+      kruskal.df[row,"n"] <- n
       kruskal.df[row,"levene.p.value"] <- leveneTest(data.df[,response], data.df[,predictor])$`Pr(>F)`[1]
       
       if (kruskal.df[row,"levene.p.value"]>alpha){
@@ -184,10 +218,16 @@ if (length(abnormal.list)>0){
     predictor <- dunn.df[row,"predictor"]
     dt <- dunn.test(data.df[,response],data.df[,predictor],method="bonferroni", 
                     kw=FALSE, table=FALSE)
+    n <- data.df %>%
+      select(c("depth.cm",response)) %>%
+      drop_na() %>%
+      count() %>%
+      as.numeric()
     temp.df <- data.frame(dt$comparisons, dt$P.adjusted)
     colnames(temp.df) <- c("comparison","dunn.p.value")
     temp.df$response <- dunn.df[row,"response"]
     temp.df$predictor <- dunn.df[row,"predictor"]
+    temp.df$dunn.n <- n
     dunn.results.df <- full_join(dunn.results.df,temp.df)
   }
   
@@ -211,5 +251,28 @@ if (length(abnormal.list)>0){
 
 # regressions -------------------------------------------------------------
 
-#response.list <- c(normal.list,abnormal.list)
+response.list <- c(normal.list,abnormal.list)
 
+regression.df <- data.frame(matrix(ncol=0,nrow=length(response.list)))
+
+for (row in 1:nrow(regression.df)){
+  response <- response.list[row]
+  regression.df[row,"response"] <- response
+  lm <- lm(get(response)~depth.cm,data=data.df)
+  n <- data.df %>%
+    select(c("depth.cm",response)) %>%
+    drop_na() %>%
+    count() %>%
+    as.numeric()
+  regression.df[row,"regression.n"] <- n
+  regression.df[row,"regression.r.squared"] <- summary(lm)$r.squared
+  regression.df[row,"regression.p.value"] <- summary(lm)$coefficients[2,4]
+  regression.df[row,"regression.slope"] <- summary(lm)$coefficients[2,1]
+  if (regression.df[row,"regression.p.value"]<alpha){
+    regression.df[row,"regression.significance"] <- TRUE
+  } else {
+    regression.df[row,"regression.significance"] <- FALSE
+  }
+}
+
+kable(regression.df)

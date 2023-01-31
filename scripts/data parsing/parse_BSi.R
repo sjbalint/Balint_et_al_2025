@@ -29,6 +29,38 @@ colnames(seal.df) <- c("Sample.ID","peak","type","SiO2.uM","ad.values")
 
 seal.df["SiO2.uM"][seal.df["SiO2.uM"] == "0"] <- NA
 
+# instrument performance --------------------------------------------------
+
+qc.n <- seal.df[grep("%", seal.df$Sample.ID),] %>%
+  count()
+
+qc.sd <- seal.df[grep("%", seal.df$Sample.ID),] %>%
+  summarize_all(sd,na.rm=TRUE) %>%
+  pull(SiO2.uM)
+
+print(qc.sd)
+
+mdl.n <- seal.df[grep("MDL", seal.df$Sample.ID),] %>%
+  filter(between(SiO2.uM,0,40)) %>%
+  count()
+
+mdl.sd <- seal.df[grep("MDL", seal.df$Sample.ID),] %>%
+  filter(between(SiO2.uM,0,40)) %>%
+  summarize_all(sd,na.rm=TRUE) %>%
+  pull(SiO2.uM) %>%
+  as.numeric()
+
+df <- as.numeric(mdl.n-1)
+
+qt <- qt(0.99,df)
+
+mdl <- qt*mdl.sd
+
+print(mdl)
+# calculate average -------------------------------------------------------
+
+
+
 seal.df <- seal.df %>%
   mutate(across(c("type"),as.factor)) %>%
   mutate(across(c("peak","SiO2.uM","ad.values"),as.numeric)) %>%
