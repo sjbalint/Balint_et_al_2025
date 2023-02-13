@@ -14,6 +14,10 @@ library(ggsci)
 
 load("Rdata/grainsize.Rdata")
 
+load("Rdata/dating.Rdata")
+
+grain.df <- left_join(grain.df,dating.df)
+
 # graphing parameters -----------------------------------------------------
 
 mywidth=9
@@ -24,7 +28,7 @@ legend_title <- NULL
 basetheme <- list(
   theme_classic(),
   coord_flip(),
-  scale_x_reverse(),
+  #scale_x_reverse(),
   theme(
     text=element_text(size=12),
     strip.background = element_blank(),
@@ -41,16 +45,16 @@ basetheme <- list(
 
 # grainsize ---------------------------------------------------------------
 
-colourCount = length(unique(grain.df$Class))
+colourCount = length(unique(grain.df$class))
 getPalette = colorRampPalette(brewer.pal(10, "RdYlBu"))
 
-ggplot(grain.df, aes(x=Depth,y=Percentage, fill=Class))+
+ggplot(grain.df, aes(x=year.mean,y=class.pct, fill=class))+
   basetheme+
-  geom_bar(position="fill",stat="identity",width=2)+
+  geom_bar(position="fill",stat="identity",width=15)+
   geom_hline(yintercept=c(0,0.25,0.5,0.75,1))+
   scale_y_continuous(labels=function(y)y*100)+
-  facet_wrap(~Location)+
-  xlab("Depth\n(cm)")+
+  facet_wrap(~location)+
+  labs(x="Year",y="Percentage",fill="Class")+
   scale_fill_manual(values = getPalette(colourCount))
 
 ggsave("figures/grainsize.png",width=mywidth, height=myheight)

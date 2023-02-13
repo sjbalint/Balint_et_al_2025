@@ -6,13 +6,14 @@ library(progress)
 library(RColorBrewer)
 library(ggsci)
 
-date_shift <- TRUE
+date_shift <- FALSE
 
 grain.df <- read_excel("raw/grainsize/grainsize_tidy.xlsx") %>%
   select(-c(Replicate,Pseudoreplicate,Core)) %>%
   group_by(Location,Depth) %>%
   summarize_all(mean) %>%
-  pivot_longer(!c(Location,Depth),names_to="Micrometers",values_to="Percentage")
+  pivot_longer(!c(Location,Depth),names_to="Micrometers",values_to="Percentage") %>%
+  ungroup()
 
 grain.df$Location <- factor(grain.df$Location,levels=c("North","Middle","South"))
 
@@ -50,5 +51,7 @@ if (date_shift==TRUE){
     }
   }
 }
+
+colnames(grain.df) <- c("location","depth.cm","grainsize.um","class.pct","class")
 
 save(grain.df,file="Rdata/grainsize.Rdata")

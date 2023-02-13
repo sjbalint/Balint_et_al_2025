@@ -24,13 +24,13 @@ legend_title <- NULL
 basetheme <- list(
   theme_classic(),
   coord_flip(),
-  scale_x_reverse(),
+  #scale_x_reverse(),
   theme(
     text=element_text(size=12),
     strip.background = element_blank(),
     strip.placement = "outside",
-    panel.grid.major.x = element_blank(), 
-    panel.grid.major.y = element_blank(),
+    #panel.grid.major.x = element_line(color="grey"), 
+    panel.grid.major.y = element_line(color="grey"),
     strip.text.y.left = element_text(angle = 0,size=12),
     strip.text.x.bottom = element_text(size=12),
     axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
@@ -41,17 +41,18 @@ basetheme <- list(
 
 mytheme <- list(
   basetheme,
-  geom_vline(aes(xintercept=date.depth.cm,color=location),show_guide = FALSE),
-  geom_label(aes(x=date.depth.cm,y=date.value,label=date.bottom),
-              fill="white",label.size = NA, hjust = 0.8),
-  geom_smooth(aes(x=depth.cm, y=value, color=location, 
+  #geom_vline(aes(xintercept=date.depth.cm,color=location),show_guide = FALSE),
+  #geom_label(aes(x=date.depth.cm,y=date.value,label=date.bottom),
+              #fill="white",label.size = NA, hjust = 0.8),
+  geom_smooth(aes(x=year.mean, y=value, color=location, 
                   #linetype=location
                   ),
               se=FALSE),
-  geom_point(aes(x=depth.cm, y=value, fill=location, shape=location),
+  geom_errorbar(aes(y=value,xmin=year.min,xmax=year.max,color=location),alpha=0.5),
+  geom_point(aes(x=year.mean, y=value, fill=location, shape=location),
              size=2.5,color="black",alpha=0.7),
   facet_wrap(~factor,nrow=1,scales="free_x",strip.position = "bottom",labeller = label_parsed),
-  labs(y=NULL,x="Depth\n(cm)",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
+  labs(y=NULL,x="Year",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
   scale_color_jco(),
   scale_fill_jco(),
   scale_shape_manual(values=c(21:24)),
@@ -60,7 +61,8 @@ mytheme <- list(
 
 ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
                                 'd13C.total',"%C.organic",'d13C.organic',"n","P.inorg",
-                                "P.total", "P.org","NP","CN","SiO2.prct","SiP","N.storage"),
+                                "P.total", "P.org","NP","CN","SiO2.prct","SiP",
+                                "N.storage","year.mean"),
                          factor=as.character(
                            c(
                              bquote("Location"),
@@ -79,7 +81,8 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("C:N"~"Ratio"),
                              bquote("Si"*O[2]~"(%)"),
                              bquote("BSi:P"~"Ratio"),
-                             bquote("N"~"Accumulation"~"Rate")
+                             bquote("N"~"Accumulation"~"Rate"),
+                             bquote("Year")
                             )
 )
 )
@@ -100,7 +103,7 @@ plot_longer <- function(data.df,long_cols){
     unique() %>%
     max()
   
-  dates.df <- plot.df[,c("location","value","factor","date.depth.cm","type")] %>%
+  dates.df <- plot.df[,c("location","value","factor","year.mean")] %>%
     filter(factor==max_factor)
   
   dates.df$date.value <- dates.df %>%
@@ -108,7 +111,7 @@ plot_longer <- function(data.df,long_cols){
     pull(value) %>%
     max()
   
-  plot.df <- left_join(plot.df,dates.df)
+  #plot.df <- left_join(plot.df,dates.df)
   
   return (plot.df)
 }
@@ -116,7 +119,7 @@ plot_longer <- function(data.df,long_cols){
 
 # remove problamatic values -----------------------------------------------
 
-temp.df <- data.df %>%
+temp.df <- data.df%>%
   filter(depth.cm!=0)
 
 for (row in 1:nrow(temp.df)){

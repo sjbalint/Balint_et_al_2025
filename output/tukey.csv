@@ -1,0 +1,6 @@
+"","response","predictor","comparison","tukey.p.value","tukey.n","tukey.significance"
+"1","P.total","century","1800-1700",0.00307396314662101,68,TRUE
+"2","P.total","century","1900-1700",2.31663414007599e-08,68,TRUE
+"3","P.total","century","2000-1700",7.60452567583059e-09,68,TRUE
+"4","P.total","century","1900-1800",0.00148494446868097,68,TRUE
+"5","P.total","century","2000-1800",0.0004524017838341,68,TRUE

@@ -35,8 +35,7 @@ for (row in 1:nrow(temp.df)){
   }
 }
 
-
-
+data.df$century <- factor(round(data.df$year.mean/100)*100) #deturmine century for stats
 
 # create a date (depth) threshold -----------------------------------------
 
@@ -52,8 +51,20 @@ for (row in 1:nrow(data.df)){
 
 alpha=0.05
 
-predictor.list <- c("location")
+predictor.list <- c("location","century")
 response.list <- c("%C.organic","%N","P.total","SiO2.prct","CN","NP","SiP","d15N.permil","d13C.organic")
+
+
+# perform summary statistics ----------------------------------------------
+
+summary.df <- data.df %>%
+  drop_na(year.mean) %>%
+  select(c("century",response.list)) %>%
+  group_by(century) %>%
+  summarize_all(mean,na.rm=TRUE) %>%
+  mutate_if(is.numeric, round, 1) %>%
+  arrange(desc(century)) %>%
+  ungroup()
 
 # test for normality ------------------------------------------------------
 
@@ -126,12 +137,17 @@ if (length(normal.list)>0){
   if (nrow(tukey.df)>0){
     tukey.results.df <- tukey.df
     
+    n <- data.df %>%
+      select(c("depth.cm",response)) %>%
+      drop_na() %>%
+      count() %>%
+      as.numeric()
+    
     for (row in 1:nrow(tukey.df)){
       response <- tukey.df[row,"response"]
       predictor <- tukey.df[row,"predictor"]
       thsd <- TukeyHSD(aov(data.df[,response] ~ data.df[,predictor]))
-      kruskal.df[row,"predictor"] <- predictor
-      temp.df <- data.frame(dimnames(thsd$`data.df[, predictor]`)[1], thsd$`data.df[, predictor]`[4])
+      temp.df <- data.frame(dimnames(thsd$`data.df[, predictor]`)[1], thsd$`data.df[, predictor]`[,4])
       colnames(temp.df) <- c("comparison","tukey.p.value")
       temp.df$response <- tukey.df[row,"response"]
       temp.df$predictor <- tukey.df[row,"predictor"]
@@ -193,8 +209,8 @@ if (length(abnormal.list)>0){
         kruskal.df[row,"kruskal.significance"] <- FALSE 
       }
       if (kruskal.df[row,"equal.variance"]==FALSE){
-        kruskal.df[row,"kruskal.p.value"] <- NA 
-        kruskal.df[row,"kruskal.significance"] <- NA
+        #kruskal.df[row,"kruskal.p.value"] <- NA 
+        #kruskal.df[row,"kruskal.significance"] <- NA
       }
     }
   }
@@ -276,3 +292,14 @@ for (row in 1:nrow(regression.df)){
 }
 
 kable(regression.df)
+
+
+# export results ----------------------------------------------------------
+
+write.csv(summary.df,"output/summary.csv")
+
+write.csv(tukey.results.df,"output/tukey.csv")
+
+write.csv(dunn.results.df,"output/dunn.csv")
+
+write.csv(regression.df,"output/regression.csv")

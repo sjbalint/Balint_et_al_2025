@@ -11,9 +11,7 @@ load("Rdata/silica.Rdata")
 
 load("Rdata/isotopes.Rdata")
 
-dates.df <- read.csv("raw/dating/core_dating_2.csv")
-
-dates.df$date.depth.cm <- dates.df$depth.cm
+load("Rdata/dating.Rdata")
 
 P.df <- read.csv("raw/phosphorus.csv")
 
@@ -28,6 +26,8 @@ data.df <- left_join(data.df,silica.df)
 
 data.df <- left_join(data.df,bulk.df)
 
+data.df <- left_join(data.df,dating.df)
+
 
 # final calculations ------------------------------------------------------
 
@@ -41,11 +41,8 @@ data.df["SiP"][data.df["SiP"]<0] <- NA
 
 data.df$P.total <- data.df$P.pct.total*100
 
-data.df <- left_join(data.df,dates.df)
-
 data.df <- data.df %>%
-  mutate(location=factor(location,levels=c("North","Middle","South")),
-         type=as.factor(type)) %>%
+  mutate(location=factor(location,levels=c("North","Middle","South"))) %>%
   mutate_if(is.character, as.numeric) %>%
   mutate_if(is.integer,as.numeric) %>%
   as.data.frame
@@ -53,7 +50,7 @@ data.df <- data.df %>%
 
 # date shift --------------------------------------------------------------
 
-date_shift <- TRUE
+date_shift <- FALSE
 
 if (date_shift==TRUE){
   for (row in 1:nrow(data.df)){

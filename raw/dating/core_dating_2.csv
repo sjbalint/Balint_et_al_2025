@@ -1,6 +1,7 @@
-location,depth.cm,date.bottom,type
-North,10,1963,Cs
-Middle,14,1963,Cs
-Middle,34,1948,Pb
-South,2,1963,Cs
-South,32,1929,Pb
+location,depth.cm,date.bottom,range.yr,type
+North,11,1962.5,,Cs
+North,26,1819.3,108.2,Pb
+Middle,14,1963,,Cs
+Middle,44,1719.4,57,Pb
+South,2,1963,,Cs
+South,24,1850.4,104.6,Pb
