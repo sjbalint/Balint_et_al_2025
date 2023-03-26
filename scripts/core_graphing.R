@@ -14,55 +14,68 @@ library(ggsci)
 
 load("Rdata/compiled_data.Rdata")
 
+date_lines.df <- data.df %>%
+  select(location,year.mean,end.pb,cs.peak) %>%
+  filter(!is.na(end.pb) | !is.na(cs.peak))
+
+for (row in 1:nrow(date_lines.df)){
+  if (!is.na(date_lines.df[row,"end.pb"])){
+    date_lines.df[row,"type"] <- "Pb-210 Minimum"
+  }
+  if (!is.na(date_lines.df[row,"cs.peak"])){
+    date_lines.df[row,"type"] <- "Cs-237 Maximum"
+  }
+}
+
 # graphing parameters -----------------------------------------------------
 
-mywidth=9
+mywidth=10
 myheight=6
 
 legend_title <- NULL
 
 basetheme <- list(
   theme_classic(),
-  coord_flip(),
-  #scale_x_reverse(),
   theme(
     text=element_text(size=12),
     strip.background = element_blank(),
     strip.placement = "outside",
     #panel.grid.major.x = element_line(color="grey"), 
-    panel.grid.major.y = element_line(color="grey"),
+    #panel.grid.major.y = element_line(color="grey"),
     strip.text.y.left = element_text(angle = 0,size=12),
     strip.text.x.bottom = element_text(size=12),
     axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
-    legend.position = "right")
+    legend.position = "top")
 )
 
 mytheme <- list(
   basetheme,
-  #geom_vline(aes(xintercept=date.depth.cm,color=location),show_guide = FALSE),
+  geom_hline(data=date_lines.df,aes(yintercept=year.mean,color=location, linetype=type)),
   #geom_label(aes(x=date.depth.cm,y=date.value,label=date.bottom),
               #fill="white",label.size = NA, hjust = 0.8),
-  geom_smooth(aes(x=year.mean, y=value, color=location, 
-                  #linetype=location
-                  ),
-              se=FALSE),
-  geom_errorbar(aes(y=value,xmin=year.min,xmax=year.max,color=location),alpha=0.5),
-  geom_point(aes(x=year.mean, y=value, fill=location, shape=location),
+  geom_smooth(aes(y=year.mean, x=value, color=location),se=FALSE, orientation="y"),
+  #geom_line(aes(x=year.mean,y=value,color=location)),
+  geom_errorbar(aes(x=value,ymin=year.min,ymax=year.max,color=location),alpha=0.3),
+  #geom_ribbon(aes(xmin=year.min,xmax=year.max,y=value,fill=location), ,alpha=0.1),
+  geom_point(aes(y=year.mean, x=value, fill=location, shape=location),
              size=2.5,color="black",alpha=0.7),
   facet_wrap(~factor,nrow=1,scales="free_x",strip.position = "bottom",labeller = label_parsed),
-  labs(y=NULL,x="Year",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
+  labs(x=NULL,y="Year",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
   scale_color_jco(),
   scale_fill_jco(),
   scale_shape_manual(values=c(21:24)),
-  scale_linetype_manual(values=c(3,2,1))
+  scale_linetype_manual(values=c(3,2,1)),
+  scale_y_continuous(breaks=c(2000,1900,1800,1700),
+                     labels=c("2000","1900","1800","Colonial\nPeriod"))
 )
 
 ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
                                 'd13C.total',"%C.organic",'d13C.organic',"n","P.inorg",
                                 "P.total", "P.org","NP","CN","SiO2.prct","SiP",
-                                "N.storage","year.mean"),
+                                "N.storage","year.mean","clay.pct","sand.pct","gravel.pct",
+                                "median.grainsize.phi","accretion.rate.gcm2yr"),
                          factor=as.character(
                            c(
                              bquote("Location"),
@@ -82,7 +95,12 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("Si"*O[2]~"(%)"),
                              bquote("BSi:P"~"Ratio"),
                              bquote("N"~"Accumulation"~"Rate"),
-                             bquote("Year")
+                             bquote("Year"),
+                             bquote("Clay"~"(%)"),
+                             bquote("Sand"~"(%)"),
+                             bquote("Gravel"~"(%)"),
+                             bquote("Median"~"Grainsize"~"("*phi*")"),
+                             bquote("Accretion"~"Rate"~"(g/"*cm^2*"/yr)")
                             )
 )
 )
@@ -98,20 +116,6 @@ plot_longer <- function(data.df,long_cols){
     unique()
   
   plot.df$factor <- factor(plot.df$factor,levels=factor_names,ordered=TRUE)
-  
-  max_factor <- plot.df$factor %>%
-    unique() %>%
-    max()
-  
-  dates.df <- plot.df[,c("location","value","factor","year.mean")] %>%
-    filter(factor==max_factor)
-  
-  dates.df$date.value <- dates.df %>%
-    filter(factor==max(factor_names)) %>%
-    pull(value) %>%
-    max()
-  
-  #plot.df <- left_join(plot.df,dates.df)
   
   return (plot.df)
 }
@@ -139,50 +143,19 @@ for (row in 1:nrow(temp.df)){
 
 data.df <- temp.df
 
-# plot isotopes -----------------------------------------------------------
+# grainsize ---------------------------------------------------------------
 
-temp.df <- plot_longer(data.df,c("d13C.organic","d15N.permil"))
+
+temp.df <- plot_longer(data.df,c("clay.pct","sand.pct","median.grainsize.phi","accretion.rate.gcm2yr"))
 
 ggplot(temp.df)+
   mytheme
 
-ggsave("figures/isotopes.png",width=mywidth, height=myheight)
-
-
-# elemental ratios --------------------------------------------------------
-
-temp.df <- plot_longer(data.df,c("CN","NP","d15N.permil"))
-
-hline_factors <- temp.df$factor %>%
-  unique()
-
-hlines.df <- data.frame(factor=hline_factors,y=c(NA,16,NA))
-
-ggplot(temp.df)+
-  geom_hline(data=hlines.df,aes(yintercept=y),linetype="dashed")+
-  mytheme
-
-ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
-
-
-
-temp.df <- plot_longer(data.df,c("CN","NP"))
-
-hline_factors <- temp.df$factor %>%
-  unique()
-
-hlines.df <- data.frame(factor=hline_factors,y=c(NA,16))
-
-ggplot(temp.df)+
-  geom_hline(data=hlines.df,aes(yintercept=y),linetype="dashed")+
-  mytheme
-
-ggsave("figures/element_ratios_2.png",width=mywidth, height=myheight)
-
+ggsave("figures/grainsize.png",width=mywidth, height=myheight)
 
 # elemental composition again ---------------------------------------------
 
-temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total"))
+temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total","SiO2.prct"))
 
 ggplot(temp.df)+
   mytheme
@@ -190,29 +163,19 @@ ggplot(temp.df)+
 ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 
-# silica ------------------------------------------------------------------
+# elemental ratios --------------------------------------------------------
 
-temp.df <- plot_longer(data.df,c("SiO2.prct","SiP","d15N.permil"))
+temp.df <- plot_longer(data.df,c("CN","NP","d15N.permil","d13C.organic"))
 
-ggplot(temp.df)+
-  mytheme
+line_factors <- temp.df$factor %>%
+  unique()
 
-ggsave("figures/silica.png",width=mywidth, height=myheight)
-
-temp.df <- plot_longer(data.df,c("SiO2.prct","SiP"))
+lines.df <- data.frame(factor=line_factors,x=c(NA,16,NA,NA))
 
 ggplot(temp.df)+
+  geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")+
   mytheme
 
-ggsave("figures/silica_2.png",width=mywidth, height=myheight)
+ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
 
-
-# N accumulation rates ----------------------------------------------------
-
-temp.df <- plot_longer(data.df,c("CN","N.storage","d15N.permil"))
-
-ggplot(temp.df)+
-  mytheme
-
-ggsave("figures/N_storage.png",width=mywidth, height=myheight)
 

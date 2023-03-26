@@ -5,6 +5,7 @@ library(readxl)
 library(progress)
 library(RColorBrewer)
 library(ggsci)
+#library(G2Sd)
 
 date_shift <- FALSE
 
@@ -25,13 +26,18 @@ colnames(mysizes.df) <- c("Micrometers")
 size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt",
                   "V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V.F. Gravel")
 
-grainsizes.df <- data.frame(size_classes,c(2,4,8,16,31,62,125,250,500,1000,2000,4000))
-colnames(grainsizes.df) <- c("Class","Micrometers")
+approx_classes <- c("Clay","Clay","Clay","Clay","Clay","Clay",
+                         "Sand","Sand","Sand","Sand","Sand","Gravel")
+
+grainsizes.df <- data.frame(size_classes,approx_classes,
+                            c(2,4,8,16,31,62,125,250,500,1000,2000,4000))
+colnames(grainsizes.df) <- c("Fine Class","Rough Class","Micrometers")
 
 for (row in 1:nrow(mysizes.df)){
   for (row2 in 1:nrow(grainsizes.df)){
     if (mysizes.df[row,"Micrometers"]<grainsizes.df[row2,"Micrometers"]){
-      mysizes.df[row,"Class"] <- grainsizes.df[row2,"Class"]
+      mysizes.df[row,"Fine Class"] <- grainsizes.df[row2,"Fine Class"]
+      mysizes.df[row,"Rough Class"] <- grainsizes.df[row2,"Rough Class"]
       break
     }
   }
@@ -39,7 +45,7 @@ for (row in 1:nrow(mysizes.df)){
 
 grain.df <- left_join(grain.df,mysizes.df)
 
-grain.df$Class <- factor(grain.df$Class,levels=size_classes)
+grain.df$`Fine Class` <- factor(grain.df$`Fine Class`,levels=size_classes)
 
 if (date_shift==TRUE){
   for (row in 1:nrow(grain.df)){
@@ -52,6 +58,6 @@ if (date_shift==TRUE){
   }
 }
 
-colnames(grain.df) <- c("location","depth.cm","grainsize.um","class.pct","class")
+colnames(grain.df) <- c("location","depth.cm","grainsize.um","class.pct","class.fine","class.rough")
 
 save(grain.df,file="Rdata/grainsize.Rdata")

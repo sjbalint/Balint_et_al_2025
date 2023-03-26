@@ -45,10 +45,10 @@ basetheme <- list(
 
 # grainsize ---------------------------------------------------------------
 
-colourCount = length(unique(grain.df$class))
+colourCount = length(unique(grain.df$fine.class))
 getPalette = colorRampPalette(brewer.pal(10, "RdYlBu"))
 
-ggplot(grain.df, aes(x=year.mean,y=class.pct, fill=class))+
+ggplot(grain.df, aes(x=year.mean,y=class.pct, fill=fine.class))+
   basetheme+
   geom_bar(position="fill",stat="identity",width=15)+
   geom_hline(yintercept=c(0,0.25,0.5,0.75,1))+

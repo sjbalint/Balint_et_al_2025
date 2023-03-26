@@ -52,7 +52,8 @@ for (row in 1:nrow(data.df)){
 alpha=0.05
 
 predictor.list <- c("location","century")
-response.list <- c("%C.organic","%N","P.total","SiO2.prct","CN","NP","SiP","d15N.permil","d13C.organic")
+response.list <- c("median.grainsize.um","accretion.rate.gcm2yr","%C.organic","%N","P.total",
+                   "SiO2.prct","CN","NP","SiP","d15N.permil","d13C.organic")
 
 
 # perform summary statistics ----------------------------------------------
@@ -62,9 +63,11 @@ summary.df <- data.df %>%
   select(c("century",response.list)) %>%
   group_by(century) %>%
   summarize_all(mean,na.rm=TRUE) %>%
-  mutate_if(is.numeric, round, 1) %>%
+  #mutate_if(is.numeric, round, 1) %>%
   arrange(desc(century)) %>%
   ungroup()
+
+kable(summary.df)
 
 # test for normality ------------------------------------------------------
 
