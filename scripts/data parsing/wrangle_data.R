@@ -56,7 +56,7 @@ data.df$Si.P.ratio <- data.df$SiO2.prct/data.df$P.pct.total
 
 data.df["Si.P.ratio"][data.df["Si.P.ratio"]<0] <- NA
 
-data.df$P.total <- data.df$P.pct.total*100
+data.df$P.total.pct.e2 <- data.df$P.pct.total*100
 
 data.df <- data.df %>%
   mutate(location=factor(location,levels=c("North","Middle","South"))) %>%

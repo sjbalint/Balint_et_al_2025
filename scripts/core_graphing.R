@@ -43,11 +43,12 @@ basetheme <- list(
     #panel.grid.major.x = element_line(color="grey"), 
     #panel.grid.major.y = element_line(color="grey"),
     strip.text.y.left = element_text(angle = 0,size=12),
-    strip.text.x.bottom = element_text(size=12),
+    strip.text.x.top = element_text(size=12),
     axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
-    legend.position = "top")
+    legend.position = "top"),
+  scale_x_continuous(position = "top")
 )
 
 mytheme <- list(
@@ -61,7 +62,7 @@ mytheme <- list(
   #geom_ribbon(aes(xmin=year.min,xmax=year.max,y=value,fill=location), ,alpha=0.1),
   geom_point(aes(y=year.mean, x=value, fill=location, shape=location),
              size=2.5,color="black",alpha=0.7),
-  facet_wrap(~factor,nrow=1,scales="free_x",strip.position = "bottom",labeller = label_parsed),
+  facet_wrap(~factor,nrow=1,scales="free_x",strip.position = "top",labeller = label_parsed),
   labs(x=NULL,y="Year",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
   scale_color_jco(),
   scale_fill_jco(),
@@ -72,8 +73,8 @@ mytheme <- list(
 )
 
 ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
-                                'd13C.total',"%C.organic",'d13C.organic',"n","P.inorg",
-                                "P.total", "P.org","NP","CN","SiO2.prct","SiP",
+                                'd13C.total',"%C.organic",'d13C.organic',"n","P.pct.inorg",
+                                "P.total.pct.e2", "P.pct.org","N.P.ratio","C.N.ratio","SiO2.prct","Si.P.ratio",
                                 "N.storage","year.mean","clay.pct","sand.pct","gravel.pct",
                                 "median.grainsize.phi","accretion.rate.gcm2yr"),
                          factor=as.character(
@@ -127,11 +128,11 @@ temp.df <- data.df%>%
   filter(depth.cm!=0)
 
 for (row in 1:nrow(temp.df)){
-  if (temp.df[row,"NP"]<0 | temp.df[row,"NP"]>40){
-    temp.df[row,"NP"] <- NA
+  if (temp.df[row,"N.P.ratio"]<0 | temp.df[row,"N.P.ratio"]>40){
+    temp.df[row,"N.P.ratio"] <- NA
   }
-  if (temp.df[row,"CN"]>40){
-    temp.df[row,"CN"] <- NA
+  if (temp.df[row,"C.N.ratio"]>40){
+    temp.df[row,"C.N.ratio"] <- NA
   }
   if (is.na(temp.df[row,"%C.organic"])==FALSE & temp.df[row,"%C.organic"] >10){
     temp.df[row,"%C.organic"] <- NA
@@ -155,7 +156,7 @@ ggsave("figures/grainsize.png",width=mywidth, height=myheight)
 
 # elemental composition again ---------------------------------------------
 
-temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total","SiO2.prct"))
+temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total.pct.e2","SiO2.prct"))
 
 ggplot(temp.df)+
   mytheme
@@ -165,7 +166,7 @@ ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 # elemental ratios --------------------------------------------------------
 
-temp.df <- plot_longer(data.df,c("CN","NP","d15N.permil","d13C.organic"))
+temp.df <- plot_longer(data.df,c("C.N.ratio","N.P.ratio","d15N.permil","d13C.organic"))
 
 line_factors <- temp.df$factor %>%
   unique()

@@ -13,7 +13,6 @@ library(ggsci)
 library(cowplot)
 
 
-
 # load data ---------------------------------------------------------------
 
 #import population data
