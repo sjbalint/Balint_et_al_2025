@@ -48,15 +48,16 @@ data.df <- left_join(data.df,dating.df)
 
 # final calculations ------------------------------------------------------
 
-data.df$N.P.ratio <- data.df$`%N`/data.df$P.pct.total
-
-data.df$C.N.ratio <- data.df$`%C.total`/data.df$`%N`
-
-data.df$Si.P.ratio <- data.df$SiO2.prct/data.df$P.pct.total
+data.df <- data.df %>%
+  mutate(
+    N.P.ratio=`%N`/P.pct.total,
+    C.N.ratio=`%C.total`/`%N`,
+    Si.P.ratio=SiO2.prct/P.pct.total,
+    Si.N.ratio=SiO2.prct/`%N`,
+    P.total.pct.e2 = P.pct.total*100
+  )
 
 data.df["Si.P.ratio"][data.df["Si.P.ratio"]<0] <- NA
-
-data.df$P.total.pct.e2 <- data.df$P.pct.total*100
 
 data.df <- data.df %>%
   mutate(location=factor(location,levels=c("North","Middle","South"))) %>%

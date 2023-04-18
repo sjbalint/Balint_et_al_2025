@@ -34,22 +34,8 @@ myheight=6
 
 legend_title <- NULL
 
-basetheme <- list(
-  theme_classic(),
-  theme(
-    text=element_text(size=12),
-    strip.background = element_blank(),
-    strip.placement = "outside",
-    #panel.grid.major.x = element_line(color="grey"), 
-    #panel.grid.major.y = element_line(color="grey"),
-    strip.text.y.left = element_text(angle = 0,size=12),
-    strip.text.x.top = element_text(size=12),
-    axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
-    axis.text.x = element_text(colour = "black"),
-    axis.text.y = element_text(colour = "black"),
-    legend.position = "top"),
-  scale_x_continuous(position = "top")
-)
+#import base graphing theme
+load("Rdata/basetheme.Rdata")
 
 mytheme <- list(
   basetheme,
@@ -72,39 +58,8 @@ mytheme <- list(
                      labels=c("2000","1900","1800","Colonial\nPeriod"))
 )
 
-ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.total",
-                                'd13C.total',"%C.organic",'d13C.organic',"n","P.pct.inorg",
-                                "P.total.pct.e2", "P.pct.org","N.P.ratio","C.N.ratio","SiO2.prct","Si.P.ratio",
-                                "N.storage","year.mean","clay.pct","sand.pct","gravel.pct",
-                                "median.grainsize.phi","accretion.rate.gcm2yr"),
-                         factor=as.character(
-                           c(
-                             bquote("Location"),
-                             bquote(atop("Depth","(cm)")),
-                             bquote("%"*"N"),
-                             bquote(delta^15*N~'(‰)'),
-                             bquote("%"*C[Total]),
-                             bquote(delta^13*C[Total]~'(‰)'),
-                             bquote("%"*C[Organic]),
-                             bquote(delta^13*C[Organic]~'(‰)'),
-                             bquote("Count"),
-                             bquote("%"*P[inorg]),
-                             bquote(P[Total]~x~10^-2~'(%)'),
-                             bquote("%"*P[organic]),
-                             bquote("N:P"~"Ratio"),
-                             bquote("C:N"~"Ratio"),
-                             bquote("Si"*O[2]~"(%)"),
-                             bquote("BSi:P"~"Ratio"),
-                             bquote("N"~"Accumulation"~"Rate"),
-                             bquote("Year"),
-                             bquote("Clay"~"(%)"),
-                             bquote("Sand"~"(%)"),
-                             bquote("Gravel"~"(%)"),
-                             bquote("Median"~"Grainsize"~"("*phi*")"),
-                             bquote("Accretion"~"Rate"~"(g/"*cm^2*"/yr)")
-                            )
-)
-)
+#import ylabels.df for the plot_longer function
+load("Rdata/graphing_labels.Rdata")
 
 plot_longer <- function(data.df,long_cols){
   plot.df <- data.df %>%
@@ -178,5 +133,17 @@ ggplot(temp.df)+
   mytheme
 
 ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
+
+# elemental ratios --------------------------------------------------------
+
+temp.df <- plot_longer(data.df,c("SiO2.prct","Si.P.ratio","Si.N.ratio"))
+
+line_factors <- temp.df$factor %>%
+  unique()
+
+ggplot(temp.df)+
+  mytheme
+
+ggsave("figures/Si_ratios.png",width=mywidth, height=myheight)
 
 

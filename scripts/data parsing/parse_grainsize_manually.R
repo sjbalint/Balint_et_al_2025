@@ -119,6 +119,7 @@ basetheme <- list(
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
     legend.position = "right",
+    legend.key.height = unit(0.5, "in")
     #legend.title=element_blank()
     ),
   scale_shape_manual(values=c(21:25)),
