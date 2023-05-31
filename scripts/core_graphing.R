@@ -55,7 +55,7 @@ mytheme <- list(
   scale_shape_manual(values=c(21:24)),
   scale_linetype_manual(values=c(3,2,1)),
   scale_y_continuous(breaks=c(2000,1900,1800,1700),
-                     labels=c("2000","1900","1800","Colonial\nPeriod"))
+                     labels=c("2000","1900","1800","Before\n1800"))
 )
 
 #import ylabels.df for the plot_longer function
