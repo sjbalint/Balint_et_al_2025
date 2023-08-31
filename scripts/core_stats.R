@@ -13,61 +13,61 @@ library(dunn.test)
 
 load("Rdata/compiled_data.Rdata")
 
-# remove problamatic values -----------------------------------------------
-
-temp.df <- data.df %>%
-  filter(depth.cm!=0)
-
-data.df <- temp.df
-
-for (row in 1:nrow(temp.df)){
-  if (temp.df[row,"NP"]<0 | temp.df[row,"NP"]>40){
-    temp.df[row,"NP"] <- NA
-  }
-  if (temp.df[row,"CN"]>40){
-    temp.df[row,"CN"] <- NA
-  }
-  if (is.na(temp.df[row,"%C.organic"])==FALSE & temp.df[row,"%C.organic"] >10){
-    temp.df[row,"%C.organic"] <- NA
-  }
-  if (is.na(temp.df[row,"%N"])==FALSE & temp.df[row,"%N"]>0.7){
-    temp.df[row,"%N"] <- NA
-  }
-}
-
-data.df$century <- factor(round(data.df$year.mean/100)*100) #deturmine century for stats
-
-# create a date (depth) threshold -----------------------------------------
-
-threshold <- 30
-
-for (row in 1:nrow(data.df)){
-  ifelse(data.df[row,"depth.cm"]< threshold,
-         data.df[row,"class"] <- "top",data.df[row,"class"] <- "bottom")
-}
-
+data.df <- data.df %>%
+  #mutate(outlier=as.factor(outlier))
+  filter(outlier==FALSE)
 
 # configure stats ---------------------------------------------------------
 
 alpha=0.05
 
 predictor.list <- c("location","century")
-response.list <- c("median.grainsize.um","accretion.rate.gcm2yr","%C.organic","%N","P.total",
-                   "SiO2.prct","CN","NP","SiP","d15N.permil","d13C.organic")
+response.list <- c("median.grainsize.um","accretion.rate.gcm2yr","%C.organic","%N","P.pct.total",
+                   "SiO2.prct","C.N.ratio","N.P.ratio","Si.P.ratio","d15N.permil","d13C.organic")
 
 
 # perform summary statistics ----------------------------------------------
 
-summary.df <- data.df %>%
-  drop_na(year.mean) %>%
-  select(c("century",response.list)) %>%
-  group_by(century) %>%
-  summarize_all(mean,na.rm=TRUE) %>%
-  #mutate_if(is.numeric, round, 1) %>%
-  arrange(desc(century)) %>%
-  ungroup()
+calculate_mean <- function(data.df,predictor){
+  
+  summary.df <- data.df %>%
+    select(c(predictor,response.list)) %>%
+    group_by_at(predictor) %>%
+    mutate(n=n()) %>%
+    summarize_all(mean,na.rm=TRUE) %>%
+    #mutate_if(is.numeric, round, 1) %>%
+    ungroup() %>%
+    drop_na()
+  
+  return(summary.df)
+  
+}
 
-kable(summary.df)
+summary_century.df <- calculate_mean(data.df,"century") %>%
+  arrange(desc(century))
+
+summary_location.df <- calculate_mean(data.df,"location")
+
+mean.df <- bind_rows(summary_century.df,summary_location.df)
+
+calculate_count <- function(data.df,predictor){
+  
+  count.df <- data.df %>%
+    select(c(response.list,predictor)) %>%
+    pivot_longer(response.list) %>%
+    drop_na() %>%
+    group_by_at(c("name",predictor)) %>%
+    count() %>%
+    pivot_wider(names_from="name",values_from="n")
+  
+  return(count.df)
+}
+
+count_century.df <- calculate_count(data.df,"century")
+
+count_location.df <- calculate_count(data.df,"location")
+
+count.df <- bind_rows(count_century.df,count_location.df)
 
 # test for normality ------------------------------------------------------
 
@@ -242,6 +242,7 @@ if (length(abnormal.list)>0){
       drop_na() %>%
       count() %>%
       as.numeric()
+    
     temp.df <- data.frame(dt$comparisons, dt$P.adjusted)
     colnames(temp.df) <- c("comparison","dunn.p.value")
     temp.df$response <- dunn.df[row,"response"]
@@ -299,10 +300,16 @@ kable(regression.df)
 
 # export results ----------------------------------------------------------
 
-write.csv(summary.df,"output/summary.csv")
+write.csv(mean.df,"output/mean.csv",row.names=FALSE)
 
-write.csv(tukey.results.df,"output/tukey.csv")
+write.csv(count.df,"output/count.csv",row.names=FALSE)
 
-write.csv(dunn.results.df,"output/dunn.csv")
+write.csv(anova.df,"output/anova.csv",row.names=FALSE)
+
+write.csv(tukey.results.df,"output/tukey.csv",row.names=FALSE)
+
+write.csv(kruskal.df,"output/kruskal.csv",row.names=FALSE)
+
+write.csv(dunn.results.df,"output/dunn.csv",row.names=FALSE)
 
 write.csv(regression.df,"output/regression.csv")

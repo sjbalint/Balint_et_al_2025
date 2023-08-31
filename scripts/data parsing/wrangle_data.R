@@ -15,10 +15,11 @@ load("Rdata/dating.Rdata")
 
 load("Rdata/grainsize.Rdata")
 
+load("Rdata/grainstats.Rdata")
+
 P.df <- read.csv("raw/phosphorus.csv")
 
 bulk.df <- read.csv("raw/bulk_density.csv")
-
 
 # summarize grainsize data ------------------------------------------------
 
@@ -34,19 +35,23 @@ colnames(grain.df) <- c("location","depth.cm","clay.pct","gravel.pct","sand.pct"
 
 # combine data ------------------------------------------------------------
 
-data.df <- left_join(isotopes.df,P.df) %>%
+data.df <- full_join(isotopes.df,P.df) %>%
   select(-n)
 
-data.df <- left_join(data.df,silica.df)
+data.df <- full_join(data.df,silica.df)
 
-data.df <- left_join(data.df,bulk.df)
+data.df <- full_join(data.df,bulk.df)
 
-data.df <- left_join(data.df,grain.df)
+data.df <- full_join(data.df,grain.df)
+
+data.df <- full_join(data.df,grainstats.df)
 
 data.df <- left_join(data.df,dating.df)
 
 
 # final calculations ------------------------------------------------------
+
+data.df["P.pct.total"][data.df["P.pct.total"]<0] <- NA
 
 data.df <- data.df %>%
   mutate(
@@ -57,32 +62,11 @@ data.df <- data.df %>%
     P.total.pct.e2 = P.pct.total*100
   )
 
-data.df["Si.P.ratio"][data.df["Si.P.ratio"]<0] <- NA
-
 data.df <- data.df %>%
   mutate(location=factor(location,levels=c("North","Middle","South"))) %>%
   mutate_if(is.character, as.numeric) %>%
   mutate_if(is.integer,as.numeric) %>%
   as.data.frame
-
-
-# date shift --------------------------------------------------------------
-
-date_shift <- FALSE
-
-if (date_shift==TRUE){
-  for (row in 1:nrow(data.df)){
-    if (data.df[row,"location"]=="South"){
-      data.df[row,"depth.cm"] <- data.df[row,"depth.cm"]+12
-      data.df[row,"date.depth.cm"] <- data.df[row,"date.depth.cm"]+12
-    }
-    if (data.df[row,"location"]=="North"){
-      data.df[row,"depth.cm"] <- data.df[row,"depth.cm"]+4
-      data.df[row,"date.depth.cm"] <- data.df[row,"date.depth.cm"]+4
-    }
-  }
-}
-
 
 # N storage ---------------------------------------------------------------
 
@@ -91,8 +75,17 @@ data.df <- data.df %>%
          median.grainsize.phi=log2(median.grainsize.um),
          accretion.rate.gcm2yr=accretion.rate.cmyr*bulk.density.gcm3)
 
+
+# denote outliers ---------------------------------------------------------
+
+data.df <- data.df %>%
+  mutate(outlier=ifelse(location=="South" & depth.cm>38,TRUE,FALSE),
+         outlier=ifelse(depth.cm==0,TRUE,outlier))
+
+data.df$century <- factor(round(data.df$year.mean/100)*100) #determine century for stats
+
 # export data -------------------------------------------------------------
 
 save(data.df,file="Rdata/compiled_data.Rdata")
 
-write.csv(data.df,"output/compiled_data_BALINT_03262023.csv",row.names=FALSE)
+write.csv(data.df,"output/compiled_data_BALINT.csv",row.names=FALSE)

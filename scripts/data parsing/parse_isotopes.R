@@ -7,7 +7,7 @@ library(readxl)
 
 # import data -------------------------------------------------------------
 
-rawdata.df <- read_excel("raw/isotopes/isotopes_09072022.xlsx") %>%
+rawdata.df <- read_excel("raw/isotopes/irms_master.xlsx",sheet="Compiled") %>%
   filter(ignore==FALSE) %>%
   select(c("location","depth.cm","sample.type","%N","d15N.permil","%C","d13C.permil")) %>%
   mutate(across(all_of(c("location","sample.type")),as.factor))
