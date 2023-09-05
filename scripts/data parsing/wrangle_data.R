@@ -56,9 +56,10 @@ data.df["P.pct.total"][data.df["P.pct.total"]<0] <- NA
 data.df <- data.df %>%
   mutate(
     N.P.ratio=`%N`/P.pct.total,
-    C.N.ratio=`%C.total`/`%N`,
+    C.N.ratio=`%C.organic`/`%N`,
     Si.P.ratio=SiO2.prct/P.pct.total,
     Si.N.ratio=SiO2.prct/`%N`,
+    C.P.ratio=`%C.organic`/`P.pct.total`,
     P.total.pct.e2 = P.pct.total*100
   )
 
@@ -79,8 +80,7 @@ data.df <- data.df %>%
 # denote outliers ---------------------------------------------------------
 
 data.df <- data.df %>%
-  mutate(outlier=ifelse(location=="South" & depth.cm>38,TRUE,FALSE),
-         outlier=ifelse(depth.cm==0,TRUE,outlier))
+  mutate(outlier=ifelse(location=="South" & depth.cm>38,TRUE,FALSE))
 
 data.df$century <- factor(round(data.df$year.mean/100)*100) #determine century for stats
 

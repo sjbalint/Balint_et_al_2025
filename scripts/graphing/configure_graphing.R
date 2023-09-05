@@ -19,7 +19,7 @@ basetheme <- list(
     axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
-    legend.position = "top"),
+    legend.position = "bottom"),
   scale_x_continuous(position = "top")
 )
 
@@ -34,7 +34,9 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                                 "SiO2.prct","Si.P.ratio", "Si.N.ratio",
                                 "N.storage","year.mean","clay.pct","sand.pct","gravel.pct",
                                 "median.grainsize.phi","accretion.rate.gcm2yr",
-                                "mean.phi","sd.phi"),
+                                "mean.phi","sd.phi","C.P.ratio",
+                                "137Cs_activity.bqkg","210Pb_excess.bqkg",
+                                "137Cs_uncertainty.bqkg","210Pb_uncertainty.bqkg"),
                          factor=as.character(
                            c(
                              bquote("Location"),
@@ -51,7 +53,7 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("%"*P[organic]),
                              bquote("N:P"~"Ratio"),
                              bquote("C:N"~"Ratio"),
-                             bquote("Si"*O[2]~"(%)"),
+                             bquote("BSi"~"(%)"),
                              bquote("Si:P"~"Ratio"),
                              bquote("Si:N"~"Ratio"),
                              bquote("N"~"Accumulation"~"Rate"),
@@ -62,7 +64,12 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("Median"~"Grainsize"~"("*phi*")"),
                              bquote("Accretion"~"Rate"~"(g/"*cm^2*"/yr)"),
                              bquote("Mean"~"Grainsize"~"("*phi*")"),
-                             bquote("Sorting"~"("*phi*")")
+                             bquote("Sorting"~"("*phi*")"),
+                             bquote("C:P"~"Ratio"),
+                             bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
+                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
+                             bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
+                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)")
                            )
                          )
 )

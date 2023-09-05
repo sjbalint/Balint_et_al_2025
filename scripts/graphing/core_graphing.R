@@ -13,8 +13,7 @@ library(ggsci)
 
 load("Rdata/compiled_data.Rdata")
 
-data.df <- data.df %>%
-  filter(outlier==FALSE)
+data.df <- data.df
 
 date_lines.df <- data.df %>%
   select(location,year.mean,end.pb,cs.peak) %>%
@@ -81,7 +80,7 @@ plot_longer <- function(data.df,long_cols){
 # grainsize ---------------------------------------------------------------
 
 
-temp.df <- plot_longer(data.df,c("sd.phi","mean.phi","accretion.rate.gcm2yr","clay.pct"))
+temp.df <- plot_longer(data.df,c("sand.pct","mean.phi","accretion.rate.gcm2yr","sd.phi"))
 
 ggplot(temp.df)+
   mytheme
@@ -90,7 +89,7 @@ ggsave("figures/grainsize.png",width=mywidth, height=myheight)
 
 # elemental composition again ---------------------------------------------
 
-temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total.pct.e2","SiO2.prct"))
+temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total.pct.e2"))
 
 ggplot(temp.df)+
   mytheme
@@ -100,18 +99,15 @@ ggsave("figures/elements.png",width=mywidth, height=myheight)
 
 # elemental ratios --------------------------------------------------------
 
-temp.df <- plot_longer(data.df,c("C.N.ratio","N.P.ratio","d15N.permil","d13C.organic"))
+temp.df <- plot_longer(data.df,c("d15N.permil","SiO2.prct","d13C.organic"))
 
 line_factors <- temp.df$factor %>%
   unique()
 
-lines.df <- data.frame(factor=line_factors,x=c(NA,16,NA,NA))
-
 ggplot(temp.df)+
-  geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")+
   mytheme
 
-ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
+ggsave("figures/isotopes.png",width=mywidth, height=myheight)
 
 # elemental ratios --------------------------------------------------------
 
@@ -126,3 +122,33 @@ ggplot(temp.df)+
 ggsave("figures/Si_ratios.png",width=mywidth, height=myheight)
 
 
+# additional ratios -------------------------------------------------------
+
+temp.df <- plot_longer(data.df,c("C.N.ratio","C.P.ratio", "N.P.ratio"))
+
+line_factors <- temp.df$factor %>%
+  unique()
+
+lines.df <- data.frame(factor=line_factors,x=c(6.625,106,16))
+
+ggplot(temp.df)+
+  geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")+
+  mytheme
+
+ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
+
+
+# chronology --------------------------------------------------------------
+
+temp.df <- plot_longer(data.df,c("C.N.ratio","C.P.ratio", "N.P.ratio"))
+
+line_factors <- temp.df$factor %>%
+  unique()
+
+lines.df <- data.frame(factor=line_factors,x=c(6.625,106,16))
+
+ggplot(temp.df)+
+  geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")+
+  mytheme
+
+ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
