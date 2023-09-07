@@ -1,5 +1,5 @@
 "response","predictor","comparison","tukey.p.value","tukey.n","tukey.significance"
-"P.pct.total","century","1900-1700",0.000310588560240133,76,TRUE
-"P.pct.total","century","2000-1700",1.50795905424772e-05,76,TRUE
-"P.pct.total","century","1900-1800",0.000834445081148716,76,TRUE
-"P.pct.total","century","2000-1800",1.11481669970992e-05,76,TRUE
+"P.pct.total","century","1900-1700",0.000688528787234022,79,TRUE
+"P.pct.total","century","2000-1700",4.58976513639797e-06,79,TRUE
+"P.pct.total","century","1900-1800",0.00170845753449567,79,TRUE
+"P.pct.total","century","2000-1800",8.84265300760134e-07,79,TRUE

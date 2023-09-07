@@ -17,6 +17,8 @@ load("Rdata/grainsize.Rdata")
 
 load("Rdata/grainstats.Rdata")
 
+load("Rdata/outliers.Rdata")
+
 P.df <- read.csv("raw/phosphorus.csv")
 
 bulk.df <- read.csv("raw/bulk_density.csv")
@@ -48,6 +50,8 @@ data.df <- full_join(data.df,grainstats.df)
 
 data.df <- left_join(data.df,dating.df)
 
+data.df <- left_join(data.df,outlier.df)
+
 
 # final calculations ------------------------------------------------------
 
@@ -76,11 +80,6 @@ data.df <- data.df %>%
          median.grainsize.phi=log2(median.grainsize.um),
          accretion.rate.gcm2yr=accretion.rate.cmyr*bulk.density.gcm3)
 
-
-# denote outliers ---------------------------------------------------------
-
-data.df <- data.df %>%
-  mutate(outlier=ifelse(location=="South" & depth.cm>38,TRUE,FALSE))
 
 data.df$century <- factor(round(data.df$year.mean/100)*100) #determine century for stats
 

@@ -22,8 +22,8 @@ data.df <- data.df %>%
 alpha=0.05
 
 predictor.list <- c("location","century")
-response.list <- c("median.grainsize.um","accretion.rate.gcm2yr","%C.organic","%N","P.pct.total",
-                   "SiO2.prct","C.N.ratio","N.P.ratio","Si.P.ratio","d15N.permil","d13C.organic")
+response.list <- c("median.grainsize.um","sd.phi","accretion.rate.gcm2yr","%C.organic","%N","P.pct.total",
+                   "SiO2.prct","C.N.ratio","N.P.ratio","C.P.ratio","d15N.permil","d13C.organic")
 
 
 # perform summary statistics ----------------------------------------------
