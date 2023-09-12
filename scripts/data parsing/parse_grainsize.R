@@ -26,7 +26,7 @@ colnames(mysizes.df) <- c("Micrometers")
 size_classes <- c("Clay","V.F. Silt","F. Silt","M. Silt","C. Silt","V.C. Silt",
                   "V.F. Sand","F. Sand","Sand","C. Sand","V.C. Sand","V.F. Gravel")
 
-approx_classes <- c("Clay","Clay","Clay","Clay","Clay","Clay",
+approx_classes <- c("Clay","Clay","Clay","Silt","Silt","Silt",
                          "Sand","Sand","Sand","Sand","Sand","Gravel")
 
 grainsizes.df <- data.frame(size_classes,approx_classes,
