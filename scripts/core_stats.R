@@ -21,8 +21,8 @@ data.df <- data.df %>%
 
 alpha=0.05
 
-predictor.list <- c("location","century")
-response.list <- c("median.grainsize.um","sd.phi","accretion.rate.gcm2yr","%C.organic","%N","P.pct.total",
+predictor.list <- c("location", "cluster")
+response.list <- c("mean.phi","sd.phi","accretion.rate.gcm2yr","%C.organic","%N","P.pct.total",
                    "SiO2.prct","C.N.ratio","N.P.ratio","C.P.ratio","d15N.permil","d13C.organic")
 
 
@@ -48,7 +48,11 @@ summary_century.df <- calculate_mean(data.df,"century") %>%
 
 summary_location.df <- calculate_mean(data.df,"location")
 
+summary_cluster.df <- calculate_mean(data.df,"cluster")
+
 mean.df <- bind_rows(summary_century.df,summary_location.df)
+
+mean.df <- bind_rows(mean.df,summary_cluster.df)
 
 calculate_count <- function(data.df,predictor){
   
@@ -67,7 +71,11 @@ count_century.df <- calculate_count(data.df,"century")
 
 count_location.df <- calculate_count(data.df,"location")
 
+count_cluster.df <- calculate_count(data.df,"cluster")
+
 count.df <- bind_rows(count_century.df,count_location.df)
+
+count.df <- bind_rows(count.df,count_cluster.df)
 
 # test for normality ------------------------------------------------------
 
@@ -262,8 +270,8 @@ if (length(abnormal.list)>0){
     }
   }
   
-  dunn.results.df <- dunn.df %>%
-    filter(dunn.significance==TRUE)
+  dunn.results.df <- dunn.df #%>%
+    #filter(dunn.significance==TRUE)
   
   kable(dunn.results.df)
 }

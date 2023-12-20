@@ -39,8 +39,8 @@ USDA_text <- USDA  %>% group_by(Label) %>%
 ggplot(data = USDA, aes(y = Clay,x = Sand, z = Silt))+
   coord_tern(L = "x", T = "y", R = "z")+
   geom_polygon(aes(group=Label),alpha = 0, size = 0.5, color = "black", show.legend=FALSE)+
-  geom_text(data = USDA_text, aes(label = Label), color = 'black',size = 2)+
   geom_point(data = texture.df,aes(x = Sand, y = Clay, shape=location, fill=year.mean))+
+  geom_text(data = USDA_text, aes(label = Label), color = 'black',size = 2)+
   theme_showarrows()+
   theme_clockwise()+
   theme(text = element_text(family = "Helvetica"))+

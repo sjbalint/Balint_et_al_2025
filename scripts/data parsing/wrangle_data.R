@@ -3,7 +3,8 @@ rm(list = ls()) #clear environment
 # import packages ---------------------------------------------------------
 
 library(tidyverse)
-
+library(cluster)
+library(factoextra) #for optimixing clusters
 
 # import data -------------------------------------------------------------
 
@@ -32,7 +33,7 @@ grain.df <- grain.df %>%
   ungroup() %>%
   pivot_wider(names_from=class.rough,values_from=class.pct)
 
-colnames(grain.df) <- c("location","depth.cm","clay.pct","gravel.pct","sand.pct")
+colnames(grain.df) <- c("location","depth.cm","clay.pct","pebbles.pct","sand.pct","silt.pct")
 
 
 # combine data ------------------------------------------------------------
@@ -82,6 +83,48 @@ data.df <- data.df %>%
 
 
 data.df$century <- factor(round(data.df$year.mean/100)*100) #determine century for stats
+
+# perform clustering ------------------------------------------------------
+
+subset.df <- data.df %>%
+  filter(outlier==FALSE) %>%
+  select(all_of(c("%N", "d15N.permil", "%C.organic", "d13C.organic","P.pct.total",
+                  "SiO2.prct","kurtosis.um","mean.phi","sd.phi",
+                  "accretion.rate.gcm2yr"))) %>%
+  drop_na()
+
+#define linkage methods
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
+#function to compute agglomerative coefficient
+ac <- function(x) {
+  agnes(subset.df, method = x)$ac
+}
+
+#calculate agglomerative coefficient for each clustering linkage method
+sapply(m, ac) #do ward
+
+#perform hierarchical clustering using Ward's minimum variance
+clust <- agnes(subset.df, method = "ward")
+
+#produce dendrogram
+pltree(clust, cex = 0.6, hang = -1, main = "Dendrogram") 
+
+#calculate gap statistic for each number of clusters (up to 10 clusters)
+gap_stat <- clusGap(subset.df, FUN = hcut, K.max = 10)
+
+#produce plot of clusters vs. gap statistic
+fviz_gap_stat(gap_stat)
+
+dist <- dist(scale(subset.df))
+clust <- hclust(dist,method="ward.D2")
+plot(clust)
+smalltree <- cutree(clust,k=4)
+
+subset.df$cluster <- as.factor(smalltree)
+
+data.df <- left_join(data.df, subset.df)
 
 # export data -------------------------------------------------------------
 

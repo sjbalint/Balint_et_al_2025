@@ -13,7 +13,9 @@ library(ggsci)
 
 load("Rdata/compiled_data.Rdata")
 
-data.df <- data.df
+data.df <- data.df %>%
+  #filter(cluster!=4) %>%
+  drop_na(cluster)
 
 date_lines.df <- data.df %>%
   select(location,year.mean,end.pb,cs.peak) %>%
@@ -40,21 +42,21 @@ load("Rdata/basetheme.Rdata")
 
 mytheme <- list(
   basetheme,
-  geom_hline(data=date_lines.df,aes(yintercept=year.mean,color=location, linetype=type)),
+  geom_hline(data=date_lines.df,aes(yintercept=year.mean,group=location, linetype=type)),
   #geom_label(aes(x=date.depth.cm,y=date.value,label=date.bottom),
               #fill="white",label.size = NA, hjust = 0.8),
   geom_smooth(aes(y=year.mean, x=value),se=FALSE, color="black", orientation="y"),
   #geom_line(aes(y=year.mean,x=value,color=location),orientation="y"),
   #geom_errorbar(aes(x=value,ymin=year.min,ymax=year.max,color=location),alpha=0.3),
   #geom_ribbon(aes(xmin=year.min,xmax=year.max,y=value,fill=location), ,alpha=0.1),
-  geom_point(aes(y=year.mean, x=value, fill=location, shape=location),
-             size=2.5,color="black",alpha=0.7),
+  geom_point(aes(y=year.mean, x=value, fill=cluster),
+             shape=21, size=2,color="black"),
+  geom_point(aes(y=year.mean, x=value, shape=location),
+             size=2,color="black", fill="grey"),
+  geom_point(aes(y=year.mean, x=value, fill=cluster, shape=location),
+             size=2.5,color="black",show.legend=FALSE),
   facet_wrap(~factor,nrow=1,scales="free_x",strip.position = "top",labeller = label_parsed),
   labs(x=NULL,y="Year",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title),
-  scale_color_jco(),
-  scale_fill_jco(),
-  scale_shape_manual(values=c(21:24)),
-  scale_linetype_manual(values=c(3,2,1)),
   scale_y_continuous(breaks=c(2000,1900,1800,1700),
                      labels=c("2000","1900","1800","Before\n1800"))
 )
@@ -69,13 +71,37 @@ plot_longer <- function(data.df,long_cols){
   plot.df <- left_join(plot.df,ylabels.df)
   
   factor_names <- plot.df %>%
-    pull(factor) %>%
+    pull(factor1) %>%
     unique()
   
-  plot.df$factor <- factor(plot.df$factor,levels=factor_names,ordered=TRUE)
+  plot.df$factor <- factor(plot.df$factor1,levels=factor_names,ordered=TRUE)
   
   return (plot.df)
 }
+
+
+# HCA results -------------------------------------------------------------
+
+plot.df <- data.df %>%
+  select(location, year.mean, cluster) %>%
+  group_by(location, cluster) %>%
+  mutate(year.max=max(year.mean),
+         year.min=min(year.mean)) %>%
+  ungroup() %>%
+  select(-year.mean) %>%
+  unique()
+
+write.csv(plot.df, "output/HCA_clusters.csv", row.names=FALSE)
+
+ggplot(plot.df, aes(x=location, xend=location, y=year.min, yend=year.max, color=cluster))+
+  basetheme+
+  scale_x_discrete(position = "top")+
+  geom_segment(linewidth=2)+
+  geom_segment(linewidth=15, show.legend=FALSE)+
+  #scale_color_viridis_d(option="cividis", direction = -1, aesthetics = c("colour", "fill"))+
+  labs(x=NULL, y="Year", color="Cluster")
+
+ggsave("figures/HCA.png",width=6, height=4)
 
 # grainsize ---------------------------------------------------------------
 
