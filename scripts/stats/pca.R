@@ -9,6 +9,8 @@ library(ggsci)
 library(cluster)
 library(factoextra) #for optimixing clusters
 
+update_geom_defaults("point", list(shape = 21, fill="grey"))
+
 # import data -------------------------------------------------------------
 
 load("Rdata/compiled_data.Rdata")
@@ -30,8 +32,7 @@ mytheme <- list(
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
     legend.position = "right"),
-  scale_fill_jco(),
-  scale_color_jco(),
+  scale_fill_viridis_d(option="cividis", direction = -1, aesthetics = c("fill","color")),
   scale_shape_manual(values=c(21:25))
 )
 
@@ -54,7 +55,7 @@ plot(pca)
 # perform clustering ------------------------------------------------------
 
 scaled <- data %>%
-  select(-c("location","century","ID", "year.mean"))
+  select(pred.list)
 
 #define linkage methods
 m <- c( "average", "single", "complete", "ward")
@@ -90,13 +91,39 @@ smalltree <- cutree(clust,k=4)
 plot.df <- data.frame(pca$scores, year.mean=data$year.mean, location=data$location)
 plot.df$cluster <- as.factor(smalltree)
 
+ggplot(plot.df, aes(Comp.1, Comp.2, fill=location, color=location, shape=location))+
+  mytheme+
+  geom_point(color="black", size=3)
+
+ggsave("figures/pca/pca2.png")
+
+ggplot(plot.df, aes(Comp.1, Comp.2, fill=year.mean, shape=location))+
+  mytheme+
+  geom_point(color="black", size=3)+
+  scale_fill_viridis_c()+
+  scale_color_viridis_c()
+
+ggsave("figures/pca/pca3.png")
+
+ggplot(plot.df, aes(year.mean, Comp.1, fill=location, color=location, shape=location))+
+  mytheme+
+  geom_line()+
+  geom_point(color="black")
+
+ggsave("figures/pca/pca4.png")
+
 ggplot(plot.df, aes(Comp.1, Comp.2, fill=cluster, color=cluster, shape=location))+
   mytheme+
-  geom_point()+
-  geom_point(color="black", show.legend=FALSE)
+  geom_point(color="black", size=3)+
+  labs(x="PC1 (51%)",y="PC2\n(17%)", fill="Cluster", shape="Location")
+
+ggsave("figures/pca/pca5.png")
 
 ggplot(plot.df, aes(year.mean, Comp.1, fill=cluster, color=cluster, shape=location))+
   mytheme+
   geom_line()+
-  geom_point()+
-  geom_point(color="black", show.legend=FALSE)
+  geom_point(color="black")+
+  labs(x="Year",y="PC1\n(51%)", fill="Cluster", color="Cluster", shape="Location")
+
+ggsave("figures/pca/pca6.png")
+

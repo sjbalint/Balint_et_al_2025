@@ -11,6 +11,7 @@ library(timevis)
 library(readxl)
 library(ggsci)
 library(cowplot)
+library(ggrepel) #for managing the text
 
 
 # load data ---------------------------------------------------------------
@@ -24,18 +25,18 @@ timeline.df <- read_excel("raw/population/timeline.xlsx") %>%
 
 #set type as a factor for graphing
 timeline.df$type <- factor(timeline.df$type, 
-                           levels=c("Physical Modification","Ecology","Nutrient Cycling"),
+                           #levels=c("Physical Modification","Ecology","Nutrient Cycling"),
                            ordered=TRUE)
 
 
 # set random direction ----------------------------------------------------
 
-random_direction<-FALSE
+random_direction<-TRUE
 
 if (random_direction){
   
   # Set the heights we will use for our milestones.
-  positions <- rep(c(1,2,3,4,5),times=10)
+  positions <- rep(c(1:5),times=10)
   
   
   # Set the directions we will use for our milestone (above and below)
@@ -54,53 +55,84 @@ if (random_direction){
   timeline.df$position <- NULL
   
   # Create columns with the specified positions and directions for each milestone event
-  timeline.df <- left_join(timeline.df, line_pos.df, by="date", all = TRUE) 
+  timeline.df <- full_join(timeline.df, line_pos.df, by="date") 
 }
 
 
 # use defined direction ---------------------------------------------------
 
+mindate <- 1700
+maxdate <- 2030
+breaks <- 50
 
+wholenumber <- function(x,n){
+  
+  result.list <- list()
+  
+  for (i in 1:length(x)){
+    
+    y <- x[i]/n
+    
+    if (y-round(y)==0){
+      
+      result <- TRUE
+      
+    } else {
+      
+      result <- FALSE
+      
+    }
+    result.list <- append(result.list, result)
+  }
+  
+  return(result.list)
+}
 
 #define dates of x axis
-date_range <- seq(1800, 2020, by=20)
-date_range.df <- data.frame(date_range)
+date_range.df <- data.frame(date_range=c(mindate:maxdate)) %>%
+  mutate(date_label=ifelse(wholenumber(date_range, breaks), date_range, NA),
+         date_breaks=ifelse(wholenumber(date_range, 10), date_range, NA))
 
 
 # plot --------------------------------------------------------------------
 
 # offset the labels 0.2 away from scatter points
-text_offset <- 0.5 
+text_offset <- 0.3 
 
 # Let's use the absolute value since we want to add the text_offset and increase space away from the scatter points 
-timeline.df$text_position <- (text_offset + abs(timeline.df$position)) * sign(timeline.df$position)
+timeline.df$text_position <- (text_offset*ceiling((nchar(timeline.df$description)/20)) + abs(timeline.df$position)) * sign(timeline.df$position)
 
 #new variable to match population x axis
 timeline.df$Year <- timeline.df$date
 
+plot.df <- population.df %>%
+  filter(Region!="Washington County")
+
 #plot of population
-p1 <- ggplot(population.df,aes(Year,Population.Thousand,fill=Region))+
-  #geom_col(color="black")+
-  geom_col(data=subset(population.df,Region=="County"),aes(fill="Washington County"), color="black")+
-  geom_col(data=subset(population.df,Region=="Tract"),aes(fill="U.S. Census Tract"),color="black")+
-  labs(y=bquote("Population"~10^3))+
+p1 <- ggplot(plot.df,aes(Year,Population/1000,fill=Region))+
+  geom_col(color="black")+
+  labs(y=bquote("Population"~"("*10^3*")"))+
   theme_classic()+
   #remove x axis
   theme(axis.title.x=element_blank(),
         axis.text.x =element_blank(),
         axis.ticks.x =element_blank(),
         axis.line.x =element_blank(),
-        legend.position=c(.2,.8))+
-  scale_fill_grey(start=0.7,end=0.9)+
+        legend.position=c(.2,.8),
+        panel.grid.major.y = element_line())+
+  scale_x_continuous(limits=c(mindate, maxdate))+
+  scale_fill_grey(start=0.9,end=0.3)+
   labs(fill=NULL)
 
 #timeline
-p2 <- ggplot(timeline.df,aes(x=Year,y=position, label=description))+
+p2 <- ggplot(timeline.df,aes(x=Year,y=position))+
   geom_hline(yintercept=0, color = "black", size=0.7)+
+  geom_segment(data=date_range.df, aes(y=-0.2, yend=0.2, x=date_label, xend=date_label))+
+  geom_segment(data=date_range.df, aes(y=-0.1, yend=0.1, x=date_breaks, xend=date_breaks))+
   geom_segment(aes(yend=0,xend=date), color='black', size=0.2)+
   geom_point(aes(shape=type,fill=type),size=3)+
-  geom_text(data=date_range.df, aes(x=date_range,y=-0.5, label=date_range),size=3.5, color='black', angle=0)+
-  geom_text(aes(y=text_position, color=type), size=3.5, vjust=0.3, show.legend=FALSE)+
+  geom_text(data=date_range.df, aes(x=date_range,y=-0.5, label=date_label),size=3.5, color='black', angle=0)+
+  geom_text(aes(y=text_position, color=type, label = str_wrap(description, 20)), size=3, direction="y", show.legend=FALSE)+
   theme_classic()+
   theme(axis.line.y=element_blank(),
         axis.text.y=element_blank(),
@@ -110,14 +142,14 @@ p2 <- ggplot(timeline.df,aes(x=Year,y=position, label=description))+
         axis.text.x =element_blank(),
         axis.ticks.x =element_blank(),
         axis.line.x =element_blank(),
-        legend.position = c(.2,.8),)+
+        legend.position = c(.4,.2),)+
   scale_shape_manual(values=21:25)+
   labs(fill=NULL, shape=NULL)+
   scale_color_uchicago(palette="dark")+
   scale_fill_uchicago(palette="dark")
  
-plot <- plot_grid(p1,p2,ncol=1,align = "v",rel_heights=c(1,2))
+plot <- plot_grid(p1,p2,ncol=1, align = "v", axis="tb", rel_heights=c(1,2))
 
 ggdraw(plot)
 
-ggsave(plot=plot,"figures/timeline.png",width=8, height=8)
+ggsave(plot=plot,"figures/timeline.png",width=10, height=8)

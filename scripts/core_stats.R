@@ -8,6 +8,8 @@ library(progress)
 library(knitr)
 library(car)
 library(dunn.test)
+library(pgirmess) #for kruskalmc
+library(heplots) #for mvn qq plots
 
 # import data -------------------------------------------------------------
 
@@ -15,7 +17,9 @@ load("Rdata/compiled_data.Rdata")
 
 data.df <- data.df %>%
   #mutate(outlier=as.factor(outlier))
-  filter(outlier==FALSE)
+  drop_na(cluster)
+
+force_nonparametric <- TRUE
 
 # configure stats ---------------------------------------------------------
 
@@ -40,6 +44,35 @@ calculate_mean <- function(data.df,predictor){
     drop_na()
   
   return(summary.df)
+  
+}
+
+calculate_n <- function(data.df, predictor, response, space=FALSE){
+  
+  n1 <- data.df %>%
+    select(c("depth.cm",predictor, response)) %>%
+    drop_na() %>%
+    group_by_at(predictor) %>%
+    count() %>%
+    rename("group"=predictor)
+  
+  n2 <- n1
+  
+  if (space){
+    n <- cross_join(n1, n2) %>%
+      mutate(comparisons=paste(group.x,"-", group.y),
+             n=n.x+n.y) %>%
+      select(comparisons, n) %>%
+      as.data.frame()
+  } else {
+    n <- cross_join(n1, n2) %>%
+      mutate(comparisons=paste0(group.x,"-", group.y),
+             n=n.x+n.y) %>%
+      select(comparisons, n) %>%
+      as.data.frame()
+  }
+  
+  return(n)
   
 }
 
@@ -76,6 +109,14 @@ count_cluster.df <- calculate_count(data.df,"cluster")
 count.df <- bind_rows(count_century.df,count_location.df)
 
 count.df <- bind_rows(count.df,count_cluster.df)
+
+pdf("figures/QQplot.pdf", width=7, height=7)
+
+#cqplot(data.df[response.list]) #doesn't look very normal
+cqplot(data.df[response.list], detrend = TRUE,
+       main=NA, pch=21, fill.color="grey", env.col=NA, ref.col="black") #ouch
+
+dev.off() 
 
 # test for normality ------------------------------------------------------
 
@@ -115,13 +156,13 @@ kable(shapiro.df)
 
 if (length(normal.list)>0){
   
-  response.list <- normal.list
+  new.response.list <- normal.list
   
   anova.df <- data.frame(matrix(ncol=0,nrow=length(response.list)*length(predictor.list)))
   
   row <- 0
   
-  for (response in response.list){
+  for (response in new.response.list){
     for (predictor in predictor.list){
       row <- row+1
       anova.df[row,"response"] <- response
@@ -148,21 +189,17 @@ if (length(normal.list)>0){
   if (nrow(tukey.df)>0){
     tukey.results.df <- tukey.df
     
-    n <- data.df %>%
-      select(c("depth.cm",response)) %>%
-      drop_na() %>%
-      count() %>%
-      as.numeric()
+    n.df <- calculate_n(data.df, predictor, response)
     
     for (row in 1:nrow(tukey.df)){
       response <- tukey.df[row,"response"]
       predictor <- tukey.df[row,"predictor"]
       thsd <- TukeyHSD(aov(data.df[,response] ~ data.df[,predictor]))
       temp.df <- data.frame(dimnames(thsd$`data.df[, predictor]`)[1], thsd$`data.df[, predictor]`[,4])
-      colnames(temp.df) <- c("comparison","tukey.p.value")
+      colnames(temp.df) <- c("comparisons","tukey.p.value")
       temp.df$response <- tukey.df[row,"response"]
       temp.df$predictor <- tukey.df[row,"predictor"]
-      temp.df$tukey.n <- n
+      temp.df <- left_join(temp.df, n.df)
       tukey.results.df <- full_join(tukey.results.df,temp.df)
     }
     
@@ -188,13 +225,17 @@ if (length(normal.list)>0){
 
 if (length(abnormal.list)>0){
   
-  response.list <- abnormal.list
+  if (force_nonparametric){
+    new.response.list <- response.list
+  } else {
+    new.response.list <- abnormal.list 
+  }
   
   kruskal.df <- data.frame(matrix(ncol=0,nrow=length(response.list)*length(predictor.list)))
   
   row <- 0
   
-  for (response in response.list){
+  for (response in new.response.list){
     for (predictor in predictor.list){
       row <- row+1
       n <- data.df %>%
@@ -240,46 +281,34 @@ if (length(abnormal.list)>0){
   
   dunn.results.df <- dunn.df
   
+  n.df <- calculate_n(data.df, predictor, response, space=TRUE)
+  
   for (row in 1:nrow(dunn.df)){
     response <- dunn.df[row,"response"]
     predictor <- dunn.df[row,"predictor"]
-    dt <- dunn.test(data.df[,response],data.df[,predictor],method="bonferroni", 
-                    kw=FALSE, table=FALSE)
-    n <- data.df %>%
-      select(c("depth.cm",response)) %>%
-      drop_na() %>%
-      count() %>%
-      as.numeric()
+    #dt <- kruskalmc(data.df[,response],data.df[,predictor], alpha=alpha)$dif.com
+    dt <- dunn.test(data.df[,response],data.df[,predictor], method="bonferroni", table=FALSE, altp=TRUE)
     
-    temp.df <- data.frame(dt$comparisons, dt$P.adjusted)
-    colnames(temp.df) <- c("comparison","dunn.p.value")
+    #comparisons <- rownames(dt)
+    
+    #temp.df <- data.frame(comparisons, dt$obs.dif, dt$critical.dif, dt$stat.signif)
+    temp.df <- data.frame(dt$comparisons, dt$altP.adjusted)
+    colnames(temp.df) <- c("comparisons","dunn.p.value")
+    #colnames(temp.df) <- c("comparison","dunn.F.stat", "dunn.F.crit", "dunn.significance")
     temp.df$response <- dunn.df[row,"response"]
     temp.df$predictor <- dunn.df[row,"predictor"]
-    temp.df$dunn.n <- n
+    temp.df <- left_join(temp.df, n.df)
     dunn.results.df <- full_join(dunn.results.df,temp.df)
   }
   
-  dunn.df <- dunn.results.df %>% 
-    drop_na(dunn.p.value)
-  
-  for (row in 1:nrow(dunn.df)){
-    if (dunn.df[row,"dunn.p.value"]<alpha/2){
-      dunn.df[row,"dunn.significance"] <- TRUE
-    } else {
-      dunn.df[row,"dunn.significance"] <- FALSE
-    }
-  }
-  
-  dunn.results.df <- dunn.df #%>%
-    #filter(dunn.significance==TRUE)
+  dunn.results.df <- dunn.results.df %>%
+    mutate(dunn.signif=ifelse(dunn.p.value<alpha, TRUE, FALSE))
   
   kable(dunn.results.df)
 }
 
 
 # regressions -------------------------------------------------------------
-
-response.list <- c(normal.list,abnormal.list)
 
 regression.df <- data.frame(matrix(ncol=0,nrow=length(response.list)))
 

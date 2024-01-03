@@ -4,39 +4,46 @@ rm(list = ls()) #clear environment
 
 library(tidyverse)
 library(readxl)
+library(ggsci)
 
 
 # county data -------------------------------------------------------------
 
-county.df <- read.csv("data/nhgis0001_ts_nominal_county.csv") %>%
+county.df <- read.csv("raw/population/nhgis0001_ts_nominal_county.csv") %>%
   filter(STATE=="Rhode Island") %>%
   filter(COUNTY=="Washington County") %>%
   rename("Year"="YEAR",
   "Population"="A00AA") %>%
   select(c("Year","STATE","COUNTY","Population"))
 
-county.df$Population.Thousand <- county.df$Population/1000
+county.df$Region <- "Washington County"
 
-county.df$Region <- "County"
 
-theme_set(theme_classic())
+# city data ---------------------------------------------------------------
 
-ggplot(county.df,aes(Year,Population.Thousand))+
-  geom_col(color="black",fill="indianred4")+
-  labs(y=bquote("Washington County Population"~10^3))
-
-save(county.df,file="Rdata/county.Rdata")
+town.df <- read.csv("raw/population/census.csv") %>%
+  filter(type=="Summary report") %>%
+  pivot_longer(c("north.kingstown.population", "wickford.population"), names_to="Region",values_to="Population")%>%
+  mutate(Region=factor(Region,
+                         levels=c("north.kingstown.population", "wickford.population"),
+                         labels=c("North Kingstown","Wickford"))) %>%
+  rename("Year"="year")
 
 # tract data --------------------------------------------------------------
 
-tract.df <- read.csv("data/nhgis0003_ts_nominal_tract.csv") %>%
+tract.df <- read.csv("raw/population/nhgis0003_ts_nominal_tract.csv") %>%
   filter(STATE=="Rhode Island") %>%
   filter(COUNTY=="Washington County") %>%
   mutate(across(c("STATE","COUNTY","YEAR"),as.factor)) %>%
   mutate_if(is.character, as.numeric) %>%
   mutate(Population=AT5AA+AT5AB) %>%
   select(c("YEAR","STATE","COUNTY","TRACTA","Population")) %>%
-  filter(TRACTA==50102 | TRACTA==50302| TRACTA==50301| TRACTA==50300)
+  filter(
+    #TRACTA==50102 |
+    TRACTA==50302 #|
+      #TRACTA==50301|
+      #TRACTA==50300
+    )
 
 tract.df$YEAR <- factor(tract.df$YEAR,
                         levels=c("1970","1980","1990","2000","2008-2012","2015-2019"),
@@ -50,24 +57,31 @@ tract.df <- tract.df %>%
   group_by(YEAR,STATE,COUNTY) %>%
   summarize_all(sum) %>%
   select(-TRACTA) %>%
-  rename("Year"="YEAR")
+  rename("Year"="YEAR") %>%
+  ungroup()
 
-tract.df$Region <- "Tract"
+tract.df$Region <- "Census Tract 503.02"
 
 
 # combine data ------------------------------------------------------------
 
-population.df <- rbind(county.df,tract.df)
+population.df <- bind_rows(county.df,town.df, tract.df) %>%
+  select(Year, Region, Population) %>%
+  mutate(Region=factor(Region, levels=c("Washington County","North Kingstown",
+                                        "Wickford","Census Tract 503.02")))
 
 save(population.df,file="Rdata/population.Rdata")
 
 theme_set(theme_classic())
 
-ggplot(population.df,aes(Year,Population.Thousand,fill=Region))+
-  geom_area(stat ="bin")+
-  labs(y=bquote("Population"~10^3))+
-  scale_fill_grey()
+ggplot(population.df,aes(Year,Population/1000,fill=Region))+
+  geom_col(position="identity", alpha=0.8, color="black")+
+  labs(y=bquote("Population (thousand)"))+
+  #scale_y_log10()+
+  theme(legend.position="top",
+        legend.title=element_blank())+
+  scale_fill_jco()
 
-
+ggsave("figures/population.png")
 
 

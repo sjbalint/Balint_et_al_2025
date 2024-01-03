@@ -1,73 +1,96 @@
-"response","predictor","comparison","dunn.p.value","dunn.n","dunn.significance"
-"mean.phi","location","Middle - North",0.00213179613157724,78,TRUE
-"mean.phi","location","Middle - South",0.040421892532665,78,FALSE
-"mean.phi","location","North - South",0.652639829253704,78,FALSE
-"mean.phi","cluster","1 - 2",2.16136550474673e-09,78,TRUE
-"mean.phi","cluster","1 - 3",0.074340833603936,78,FALSE
-"mean.phi","cluster","2 - 3",0.239015258405736,78,FALSE
-"mean.phi","cluster","1 - 4",1,78,FALSE
-"mean.phi","cluster","2 - 4",0.00063236357829609,78,TRUE
-"mean.phi","cluster","3 - 4",0.115591977790612,78,FALSE
-"sd.phi","location","Middle - North",0.00435180149966149,78,TRUE
-"sd.phi","location","Middle - South",0.398935179400377,78,FALSE
-"sd.phi","location","North - South",0.139084521983372,78,FALSE
-"sd.phi","cluster","1 - 2",6.44808272870104e-05,78,TRUE
-"sd.phi","cluster","1 - 3",5.3776776468899e-08,78,TRUE
-"sd.phi","cluster","2 - 3",0.00697852025792959,78,TRUE
-"sd.phi","cluster","1 - 4",2.42172078315971e-05,78,TRUE
-"sd.phi","cluster","2 - 4",0.0397864738018726,78,FALSE
-"sd.phi","cluster","3 - 4",1,78,FALSE
-"accretion.rate.gcm2yr","cluster","1 - 2",0.00312300482982194,75,TRUE
-"accretion.rate.gcm2yr","cluster","1 - 3",9.25255148514028e-07,75,TRUE
-"accretion.rate.gcm2yr","cluster","2 - 3",0.00481886718961378,75,TRUE
-"accretion.rate.gcm2yr","cluster","1 - 4",1,75,FALSE
-"accretion.rate.gcm2yr","cluster","2 - 4",1,75,FALSE
-"accretion.rate.gcm2yr","cluster","3 - 4",0.0210729930602571,75,TRUE
-"%C.organic","cluster","1 - 2",3.1487354559267e-08,80,TRUE
-"%C.organic","cluster","1 - 3",1.08968533612697e-07,80,TRUE
-"%C.organic","cluster","2 - 3",0.157749481296418,80,FALSE
-"%C.organic","cluster","1 - 4",1,80,FALSE
-"%C.organic","cluster","2 - 4",0.00164349536891403,80,TRUE
-"%C.organic","cluster","3 - 4",7.84043630199637e-05,80,TRUE
-"%N","cluster","1 - 2",3.1307864424248e-08,80,TRUE
-"%N","cluster","1 - 3",1.13018397970493e-09,80,TRUE
-"%N","cluster","2 - 3",0.0193033170872111,80,TRUE
-"%N","cluster","1 - 4",1,80,FALSE
-"%N","cluster","2 - 4",0.132583462647367,80,FALSE
-"%N","cluster","3 - 4",0.00159408887532271,80,TRUE
-"SiO2.prct","cluster","1 - 2",5.49685384197714e-06,80,TRUE
-"SiO2.prct","cluster","1 - 3",8.42747334898735e-07,80,TRUE
-"SiO2.prct","cluster","2 - 3",0.087221730278255,80,FALSE
-"SiO2.prct","cluster","1 - 4",9.32589253650202e-05,80,TRUE
-"SiO2.prct","cluster","2 - 4",0.166499566500831,80,FALSE
-"SiO2.prct","cluster","3 - 4",1,80,FALSE
-"C.N.ratio","cluster","1 - 2",0.00066722335060792,80,TRUE
-"C.N.ratio","cluster","1 - 3",0.0010763187130019,80,TRUE
-"C.N.ratio","cluster","2 - 3",0.616217738314965,80,FALSE
-"C.N.ratio","cluster","1 - 4",6.84741336953324e-05,80,TRUE
-"C.N.ratio","cluster","2 - 4",0.0354832809797554,80,FALSE
-"C.N.ratio","cluster","3 - 4",0.524061596359904,80,FALSE
-"N.P.ratio","cluster","1 - 2",0.000563549737136158,79,TRUE
-"N.P.ratio","cluster","1 - 3",1,79,FALSE
-"N.P.ratio","cluster","2 - 3",0.103754819575716,79,FALSE
-"N.P.ratio","cluster","1 - 4",0.299969870717242,79,FALSE
-"N.P.ratio","cluster","2 - 4",0.00129425235391976,79,TRUE
-"N.P.ratio","cluster","3 - 4",0.278866313135925,79,FALSE
-"C.P.ratio","cluster","1 - 2",0.0148088419937902,79,TRUE
-"C.P.ratio","cluster","1 - 3",0.87053796678468,79,FALSE
-"C.P.ratio","cluster","2 - 3",0.00897679801918054,79,TRUE
-"C.P.ratio","cluster","1 - 4",0.0369241160949287,79,FALSE
-"C.P.ratio","cluster","2 - 4",0.000240503502839207,79,TRUE
-"C.P.ratio","cluster","3 - 4",0.401100001042844,79,FALSE
-"d15N.permil","cluster","1 - 2",7.65787037008348e-07,80,TRUE
-"d15N.permil","cluster","1 - 3",0.000228474664359277,80,TRUE
-"d15N.permil","cluster","2 - 3",1,80,FALSE
-"d15N.permil","cluster","1 - 4",5.97575200412177e-06,80,TRUE
-"d15N.permil","cluster","2 - 4",0.0595438605110905,80,FALSE
-"d15N.permil","cluster","3 - 4",0.358682829600802,80,FALSE
-"d13C.organic","cluster","1 - 2",0.00218744953597284,80,TRUE
-"d13C.organic","cluster","1 - 3",0.000167278423692562,80,TRUE
-"d13C.organic","cluster","2 - 3",0.151650435585041,80,FALSE
-"d13C.organic","cluster","1 - 4",0.212568969528873,80,FALSE
-"d13C.organic","cluster","2 - 4",0.00134440234858851,80,TRUE
-"d13C.organic","cluster","3 - 4",6.0840828479633e-05,80,TRUE
+"response","predictor","comparisons","dunn.p.value","n","dunn.signif"
+"mean.phi","location","Middle - North",0.00453866714866866,NA,TRUE
+"mean.phi","location","Middle - South",0.104886669352959,NA,FALSE
+"mean.phi","location","North - South",1,NA,FALSE
+"mean.phi","cluster",NA,NA,NA,NA
+"sd.phi","location",NA,NA,NA,NA
+"sd.phi","cluster",NA,NA,NA,NA
+"accretion.rate.gcm2yr","cluster",NA,NA,NA,NA
+"%C.organic","cluster",NA,NA,NA,NA
+"%N","cluster",NA,NA,NA,NA
+"P.pct.total","cluster",NA,NA,NA,NA
+"SiO2.prct","cluster",NA,NA,NA,NA
+"C.N.ratio","cluster",NA,NA,NA,NA
+"N.P.ratio","cluster",NA,NA,NA,NA
+"C.P.ratio","cluster",NA,NA,NA,NA
+"d15N.permil","location",NA,NA,NA,NA
+"d15N.permil","cluster",NA,NA,NA,NA
+"d13C.organic","cluster",NA,NA,NA,NA
+"mean.phi","cluster","1 - 2",4.32273100949347e-09,62,TRUE
+"mean.phi","cluster","1 - 3",0.148681667207872,33,FALSE
+"mean.phi","cluster","2 - 3",0.478030516811471,45,FALSE
+"mean.phi","cluster","1 - 4",1,29,FALSE
+"mean.phi","cluster","2 - 4",0.00126472715659218,41,TRUE
+"mean.phi","cluster","3 - 4",0.231183955581224,12,FALSE
+"sd.phi","location","Middle - North",0.0167496076191897,NA,TRUE
+"sd.phi","location","Middle - South",1,NA,FALSE
+"sd.phi","location","North - South",0.283746917266802,NA,FALSE
+"sd.phi","cluster","1 - 2",0.000128961654574021,62,TRUE
+"sd.phi","cluster","1 - 3",1.07553552937798e-07,33,TRUE
+"sd.phi","cluster","2 - 3",0.0139570405158592,45,TRUE
+"sd.phi","cluster","1 - 4",4.84344156631942e-05,29,TRUE
+"sd.phi","cluster","2 - 4",0.0795729476037452,41,FALSE
+"sd.phi","cluster","3 - 4",1,12,FALSE
+"accretion.rate.gcm2yr","cluster","1 - 2",0.00624600965964389,62,TRUE
+"accretion.rate.gcm2yr","cluster","1 - 3",1.85051029702806e-06,33,TRUE
+"accretion.rate.gcm2yr","cluster","2 - 3",0.00963773437922757,45,TRUE
+"accretion.rate.gcm2yr","cluster","1 - 4",1,29,FALSE
+"accretion.rate.gcm2yr","cluster","2 - 4",1,41,FALSE
+"accretion.rate.gcm2yr","cluster","3 - 4",0.0421459861205142,12,TRUE
+"%C.organic","cluster","1 - 2",6.2974709118534e-08,62,TRUE
+"%C.organic","cluster","1 - 3",2.17937067225394e-07,33,TRUE
+"%C.organic","cluster","2 - 3",0.315498962592836,45,FALSE
+"%C.organic","cluster","1 - 4",1,29,FALSE
+"%C.organic","cluster","2 - 4",0.00328699073782805,41,TRUE
+"%C.organic","cluster","3 - 4",0.000156808726039927,12,TRUE
+"%N","cluster","1 - 2",6.26157288484959e-08,62,TRUE
+"%N","cluster","1 - 3",2.26036795940986e-09,33,TRUE
+"%N","cluster","2 - 3",0.0386066341744222,45,TRUE
+"%N","cluster","1 - 4",1,29,FALSE
+"%N","cluster","2 - 4",0.265166925294734,41,FALSE
+"%N","cluster","3 - 4",0.00318817775064542,12,TRUE
+"P.pct.total","cluster","1 - 2",0.000406365003184981,62,TRUE
+"P.pct.total","cluster","1 - 3",4.9205499016516e-08,33,TRUE
+"P.pct.total","cluster","2 - 3",0.00468090903050081,45,TRUE
+"P.pct.total","cluster","1 - 4",0.000564287830854352,29,TRUE
+"P.pct.total","cluster","2 - 4",0.250430702723867,41,FALSE
+"P.pct.total","cluster","3 - 4",1,12,FALSE
+"SiO2.prct","cluster","1 - 2",1.09937076839543e-05,62,TRUE
+"SiO2.prct","cluster","1 - 3",1.68549466979747e-06,33,TRUE
+"SiO2.prct","cluster","2 - 3",0.17444346055651,45,FALSE
+"SiO2.prct","cluster","1 - 4",0.00018651785073004,29,TRUE
+"SiO2.prct","cluster","2 - 4",0.332999133001661,41,FALSE
+"SiO2.prct","cluster","3 - 4",1,12,FALSE
+"C.N.ratio","cluster","1 - 2",0.00133444670121584,62,TRUE
+"C.N.ratio","cluster","1 - 3",0.00215263742600379,33,TRUE
+"C.N.ratio","cluster","2 - 3",1,45,FALSE
+"C.N.ratio","cluster","1 - 4",0.000136948267390665,29,TRUE
+"C.N.ratio","cluster","2 - 4",0.0709665619595107,41,FALSE
+"C.N.ratio","cluster","3 - 4",1,12,FALSE
+"N.P.ratio","cluster","1 - 2",0.00112709947427232,62,TRUE
+"N.P.ratio","cluster","1 - 3",1,33,FALSE
+"N.P.ratio","cluster","2 - 3",0.207509639151432,45,FALSE
+"N.P.ratio","cluster","1 - 4",0.599939741434484,29,FALSE
+"N.P.ratio","cluster","2 - 4",0.00258850470783951,41,TRUE
+"N.P.ratio","cluster","3 - 4",0.55773262627185,12,FALSE
+"C.P.ratio","cluster","1 - 2",0.0296176839875803,62,TRUE
+"C.P.ratio","cluster","1 - 3",1,33,FALSE
+"C.P.ratio","cluster","2 - 3",0.0179535960383611,45,TRUE
+"C.P.ratio","cluster","1 - 4",0.0738482321898574,29,FALSE
+"C.P.ratio","cluster","2 - 4",0.000481007005678414,41,TRUE
+"C.P.ratio","cluster","3 - 4",0.802200002085688,12,FALSE
+"d15N.permil","location","Middle - North",0.0417549284588833,NA,TRUE
+"d15N.permil","location","Middle - South",0.0314920280684067,NA,TRUE
+"d15N.permil","location","North - South",1,NA,FALSE
+"d15N.permil","cluster","1 - 2",1.5315740740167e-06,62,TRUE
+"d15N.permil","cluster","1 - 3",0.000456949328718554,33,TRUE
+"d15N.permil","cluster","2 - 3",1,45,FALSE
+"d15N.permil","cluster","1 - 4",1.19515040082435e-05,29,TRUE
+"d15N.permil","cluster","2 - 4",0.119087721022181,41,FALSE
+"d15N.permil","cluster","3 - 4",0.717365659201605,12,FALSE
+"d13C.organic","cluster","1 - 2",0.00437489907194569,62,TRUE
+"d13C.organic","cluster","1 - 3",0.000334556847385123,33,TRUE
+"d13C.organic","cluster","2 - 3",0.303300871170082,45,FALSE
+"d13C.organic","cluster","1 - 4",0.425137939057745,29,FALSE
+"d13C.organic","cluster","2 - 4",0.00268880469717702,41,TRUE
+"d13C.organic","cluster","3 - 4",0.000121681656959266,12,TRUE
