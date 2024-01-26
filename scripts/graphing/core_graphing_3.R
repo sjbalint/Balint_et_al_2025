@@ -9,6 +9,7 @@ library(cowplot)
 library(ggsignif)
 library(ggpubr) #to add stats to ggplot
 library(ggtukey) #for cld
+library(rstatix) #for dunn's
 #library(devtols)
 #devtools::install_github("https://github.com/ethanbass/ggtukey/")
 
@@ -99,6 +100,24 @@ make_plot <- function(long.df){
   
 }
 
+print_stats <- function(long.df, hide.ns=TRUE){
+  
+  stat.test <- long.df %>%
+    group_by(name) %>%
+    dunn_test(value~cluster,p.adjust.method="bonferroni") %>%
+    mutate(comparison=paste0(group1,"-",group2),
+           p.adj=p.adj) %>%
+    mutate(ntotal=n1+n2) %>%
+    select(name, comparison, n1, n2, ntotal, p.adj)
+  
+  if (hide.ns){
+    stat.test <- stat.test %>%
+      filter(p.adj<0.05)
+  }
+  
+  print(stat.test, n=nrow(stat.test))
+}
+
 # HCA results -------------------------------------------------------------
 
 plot.df <- data.df %>%
@@ -129,6 +148,8 @@ temp.df <- plot_longer(data.df,c("sand.pct","mean.phi","accretion.rate.gcm2yr","
 
 make_plot(temp.df)
 
+print_stats(temp.df)
+
 ggsave("figures/grainsize.png",width=mywidth, height=myheight)
 
 # elemental composition again ---------------------------------------------
@@ -136,6 +157,9 @@ ggsave("figures/grainsize.png",width=mywidth, height=myheight)
 temp.df <- plot_longer(data.df,c("%C.organic","%N","P.total.pct.e2"))
 
 make_plot(temp.df)
+
+print_stats(temp.df)
+
 
 ggsave("figures/elements.png",width=mywidth, height=myheight)
 
@@ -148,8 +172,7 @@ line_factors <- temp.df$factor %>%
 
 make_plot(temp.df)
 
-# -------------------------------------------------------------------------
-
+print_stats(temp.df)
 
 ggsave("figures/isotopes.png",width=mywidth, height=myheight)
 
@@ -161,6 +184,8 @@ line_factors <- temp.df$factor %>%
   unique()
 
 make_plot(temp.df)
+
+print_stats(temp.df)
 
 ggsave("figures/Si_ratios.png",width=mywidth, height=myheight)
 
@@ -176,5 +201,7 @@ lines.df <- data.frame(factor=line_factors,x=c(6.625,106,16))
 
 make_plot(temp.df)+
   geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")
+
+print_stats(temp.df)
 
 ggsave("figures/element_ratios.png",width=mywidth, height=myheight)
