@@ -1,4 +1,4 @@
-## Ran on Thu Nov 21 17:10:33 2024 
+## Ran on Mon Nov 25 10:28:57 2024 
 
 Cal 0 : ConstCal;
 Cal 1 : IntCal20, 0;
@@ -7,7 +7,7 @@ Cal 3 : SHCal20, 0;
 Cal 4 : ConstCal;
 
 ##	alPhi	mPhi	alS	mS	Al	theta0	Radon_case	supported_data_file
-Cal 5 : Plum, 2, 50, 5, 10, 0.1, -71.167, 2, /Users/Sawyer/Library/CloudStorage/Dropbox-BOSTONUNIVERSITY/Sawyer Balint/GitHub/EPA/wickford_cores/Plum_runs/M6_2.23/M6_2.23_45.plum;
+Cal 5 : Plum, 2, 50, 5, 10, 0.1, -71.167, 2, /Users/Sawyer/Library/CloudStorage/Dropbox-BOSTONUNIVERSITY/Sawyer Balint/GitHub/EPA/wickford_cores/Plum_runs/Middle/Middle_51.plum;
 ##    , labID, X210Pb.Bq.kg., sd.210Pb., depth.cm., thickness.cm., density.g.cm.3., t.a, t.b, cc,  ... Plum: 210Pb data
 Det 0 : NA , 175.9488, 1e+05, 0, 2, 2.853207, 3, 4, 5;
 Det 1 : M6_01 , 175.9488, 12.81421, 2, 2, 2.853207, 3, 4, 5;
@@ -37,6 +37,7 @@ Det 24 : M6_23 , 24.82918, 9.295449, 44, 2, 9.468587, 3, 4, 5;
 Det 25 : M6_24 , 32.02835, 8.819735, 46, 2, 7.738729, 3, 4, 5;
 Det 26 : M6_25 , 29.88135, 10.22832, 48, 2, 12.06718, 3, 4, 5;
 Det 27 : M6_26 , 37.33801, 8.815595, 50, 2, 12.31793, 3, 4, 5;
+Det 28 : NA , 37.33801, 1e+08, 50.2, 2, 12.31793, 3, 4, 5;
 
 ##		 K   MinAge   MaxAge   th0   th0p   w.a   w.b   alpha  beta  dmin  dmax
-Bacon 0: FixT, 45,  -71.1669999999999,  1e+06,  -71.1569999999999,  -71.1469999999999,  5,  5,  1.5,  0.15, 0, 45;
+Bacon 0: FixT, 51,  -71.1669999999999,  1e+06,  -71.1569999999999,  -71.1469999999999,  5,  5,  1.5,  0.15, 0, 51;

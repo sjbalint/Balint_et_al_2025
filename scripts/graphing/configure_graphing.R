@@ -1,6 +1,4 @@
 
-rm(list = ls()) #clear environment
-
 # import packages ---------------------------------------------------------
 
 library(tidyverse)
