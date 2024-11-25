@@ -6,36 +6,30 @@ source("scripts/agedepth.R")
 
 source("scripts/graphing/configure_graphing.R")
 
-# northern core -----------------------------------------------------------
 
-Plum(core="Northern",ra.case=c(2),otherdates="Northern_Cs137.csv", BCAD=TRUE, remove.tail = FALSE)
+# function for running plum models ---------------------------------------
 
-# middle core -------------------------------------------------------------
+run_plum <- function(name){
+  
+  Plum(core=name,ra.case=c(2),otherdates=paste0(name,"_Cs137.csv"),
+       BCAD = TRUE, remove.tail = FALSE, n.supp = 0,
+       ask = FALSE,
+       age.lab = "Year",
+       cal.col = rgb(207/255, 68/255, 70/255),
+       cal.border = "black",
+       mn.col="black", mn.lty=1, mn.lwd=2,
+       prior.fontcol=rgb(120/255, 28/255, 109/255),
+       prior.col=rgb(120/255, 28/255, 109/255))
+}
 
-Plum(core="Middle",ra.case=c(2),otherdates="Middle_Cs137.csv", BCAD=TRUE, remove.tail = FALSE, n.supp=0)
 
-# southern core -----------------------------------------------------------
+# run plum models ---------------------------------------------------------
 
-Plum(core="Southern",ra.case=c(2),otherdates="Southern_Cs137.csv",BCAD=TRUE, remove.tail = FALSE, n.supp=0)
+run_plum("Northern")
 
-#likelihood that pb210 has reached background
-background()
-agedepth(age.lab="Year",
-         cal.col =rgb(207/255, 68/255, 70/255),
-         cal.border = "black",
-         mn.col="black",
-         mn.lty=1,
-         mn.lwd=2,
-         pbmodelled.col= function(x) rgb(0, 0, 1, 0.7 * x),
-         supp.col = rgb(120/255, 28/255, 109/255),
-         prior.fontcol=1,
-         prior.col=rgb(120/255, 28/255, 109/255),
-         pb.lty = 1,
-         pbmeasured.col="black")
+run_plum("Middle")
 
-draw.pbmeasured(pbmeasured.col="black",
-                pbmeasured.lty=1,
-                newplot=TRUE)
+run_plum("Southern")
 
 df1 <- info$detsOrig %>%
   mutate(name="210Pb")

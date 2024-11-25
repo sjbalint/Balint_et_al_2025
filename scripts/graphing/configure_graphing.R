@@ -1,10 +1,13 @@
 
+
 # import packages ---------------------------------------------------------
 
 library(tidyverse)
 
 
 # create default graphing theme -------------------------------------------
+
+update_geom_defaults("point", list(shape = 21, fill="grey", stroke=0.8))
 
 basetheme <- list(
   theme_classic(),
@@ -19,12 +22,13 @@ basetheme <- list(
     axis.text.y = element_text(colour = "black"),
     legend.position = "bottom"),
   scale_x_continuous(position = "top"),
-  scale_color_viridis_d(option="cividis", direction = -1, aesthetics = c("colour", "fill")),
+  scale_color_viridis_d(option="inferno",
+                        direction = -1,
+                        aesthetics = c("colour", "fill"),
+                        begin = 0.1, end=0.9),
   scale_shape_manual(values=c(21:26)),
   scale_linetype_manual(values=c(3,2,1))
 )
-
-save(basetheme,file="Rdata/basetheme.Rdata")
 
 
 # create a dataframe for axis labels --------------------------------------
@@ -37,7 +41,8 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                                 "median.grainsize.phi","accretion.rate.gcm2yr",
                                 "mean.phi","sd.phi","C.P.ratio",
                                 "137Cs_activity.bqkg","210Pb_excess.bqkg",
-                                "137Cs_uncertainty.bqkg","210Pb_uncertainty.bqkg"),
+                                "137Cs_uncertainty.bqkg","210Pb_uncertainty.bqkg",
+                                "year.min","year.max"),
                          factor1=as.character(
                            c(
                              bquote("Location"),
@@ -70,7 +75,9 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
                              bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
                              bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
-                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)")
+                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
+                             bquote("Min"),
+                             bquote("Max")
                            )
                          ),
                          factor2=as.character(
@@ -105,9 +112,9 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
                              bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
                              bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
-                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)")
+                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
+                             bquote("Min"),
+                             bquote("Max")
                            )
                          )
 )
-
-save(ylabels.df,file="Rdata/graphing_labels.Rdata")

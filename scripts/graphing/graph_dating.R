@@ -11,11 +11,44 @@ library(ggsci)
 
 # import data -------------------------------------------------------------
 
-data.df <- read_excel("raw/dating/raw_dating.xlsx") %>%
+data.df <- read_excel("raw/raw_dating.xlsx") %>%
   as.data.frame() %>%
   mutate(location=factor(location,levels=c("North","Middle","South")))
 
 load("Rdata/dating.Rdata")
+
+dating.df <- dating.df %>%
+  filter(depth.cm>=0) %>%
+  mutate(location=factor(location,levels=c("North","Middle","South")))
+
+
+# end pb ------------------------------------------------------------------
+
+result.list <- list()
+
+for (mylocation in unique(data.df$location)){
+  
+  end.pb <- FALSE
+  
+  df <- dating.df %>%
+    filter(location==mylocation) %>%
+    arrange(depth.cm)
+  
+  for (row in 1:nrow(df)){
+    
+    if (!is.na(df[row,"end.pb"])){
+      end.pb <- TRUE
+    }
+    
+    df[row,"end.pb"] <- end.pb
+    
+  }
+  
+  result.list <- append(result.list, list(df))
+  
+}
+
+dating.df <- bind_rows(result.list)
 
 # graphing parameters -----------------------------------------------------
 
@@ -24,11 +57,7 @@ myheight=10
 
 legend_title <- NULL
 
-#import base graphing theme
-load("Rdata/basetheme.Rdata")
-
-#import ylabels.df for the plot_longer function
-load("Rdata/graphing_labels.Rdata")
+source("scripts/graphing/configure_graphing.R")
 
 plot_longer <- function(data.df,long_cols){
   plot.df <- data.df %>%
@@ -37,30 +66,44 @@ plot_longer <- function(data.df,long_cols){
   plot.df <- left_join(plot.df,ylabels.df)
   
   factor_names <- plot.df %>%
-    pull(factor) %>%
+    pull(factor1) %>%
     unique()
   
-  plot.df$factor <- factor(plot.df$factor,levels=factor_names,ordered=TRUE)
+  plot.df <- plot.df %>%
+    mutate(factor =factor(factor1,levels=factor_names),
+           name=factor(name))
   
   return (plot.df)
 }
 
 # dating ---------------------------------------------------------------
 
-temp.df <- plot_longer(data.df,c("137Cs_activity.bqkg","210Pb_excess.bqkg")) %>%
+fill.df <- plot_longer(data.df,c("137Cs_activity.bqkg","210Pb_excess.bqkg")) %>%
   select(c("location","depth.cm","factor","value"))
 
 error.df <- plot_longer(data.df,c("137Cs_uncertainty.bqkg","210Pb_uncertainty.bqkg")) %>%
   select(c("location","depth.cm","depth.min","depth.max","factor","value")) %>%
   rename("uncertainty"="value")
 
-temp.df <- full_join(temp.df,error.df) %>%
+fill.df <- full_join(fill.df,error.df) %>%
   mutate(max=value+uncertainty,
-         min=value-uncertainty)
+         min=value-uncertainty,
+         vline=0)
 
-ggplot(temp.df)+
+year.df <- plot_longer(dating.df,c("year.mean")) %>%
+  select(c("location","depth.cm","factor","value"))
+
+error.df <- dating.df %>%
+  select(location, depth.cm, year.min, year.max, end.pb) %>%
+  rename(min=year.min, max=year.max)
+
+year.df <- left_join(year.df, error.df)
+
+year.df <- bind_rows(fill.df, year.df)
+
+ggplot(year.df)+
   basetheme+
-  geom_area(aes(y=depth.cm,x=value, fill=location),orientation="y", alpha=0.3)+
+  geom_area(data=fill.df, aes(y=depth.cm,x=value, fill=location),orientation="y", alpha=0.3)+
   geom_line(aes(y=depth.cm,x=value),orientation="y")+
   geom_errorbarh(aes(x=value,y=depth.cm,
                      xmin=min, xmax=max),alpha=0.8)+
@@ -68,36 +111,10 @@ ggplot(temp.df)+
            size=2.5,color="black",alpha=0.7)+
   facet_grid(location~factor,scales="free_x",labeller = label_parsed)+
   labs(x=NULL,y="Depth\ncm",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title)+
-  scale_color_jco()+
-  scale_fill_jco()+
   scale_shape_manual(values=c(21:24))+
   theme(legend.position="none")+
   scale_y_reverse()+
-  geom_vline(xintercept=0)
+  geom_vline(data=fill.df, aes(xintercept=vline))
 
-ggsave("figures/dating.png",width=mywidth, height=myheight)
+ggsave("figures/S6.png",width=12, height=10)
 
-
-# dating ---------------------------------------------------------------
-
-mywidth=10
-myheight=6
-
-dating.df <- dating.df %>%
-  filter(depth.cm>=0) %>%
-  mutate(location=factor(location,levels=c("North","Middle","South")))
-
-ggplot(dating.df)+
-  basetheme+
-  geom_line(aes(y=depth.cm,x=year.mean),orientation="y")+
-  geom_ribbon(aes(x=year.mean,y=depth.cm,
-                     xmin=year.min, xmax=year.max, fill=location),alpha=0.5)+
-  facet_wrap(~location, strip.position="bottom")+
-  labs(x="Year",y="Depth\n(cm)",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title)+
-  scale_color_jco()+
-  scale_fill_jco()+
-  scale_shape_manual(values=c(21:24))+
-  theme(legend.position="none")+
-  scale_y_reverse()
-
-ggsave("figures/chronology.png",width=mywidth, height=myheight)
