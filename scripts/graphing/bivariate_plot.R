@@ -4,11 +4,11 @@ rm(list = ls()) #clear environment
 library(tidyverse)
 library(ggsci)
 
-load("Rdata/grainstats.Rdata")
+source("scripts/graphing/configure_graphing.R")
+
+load("Rdata/compiled_data.Rdata")
 
 # graphing parameters -----------------------------------------------------
-
-update_geom_defaults("point", list(shape = 21, fill="grey"))
 
 basetheme <- list(
   theme_classic(),
@@ -21,9 +21,6 @@ basetheme <- list(
     #axis.title.y = element_text(angle = 0,vjust=0.5,size=12),
     axis.text.x = element_text(colour = "black"),
     axis.text.y = element_text(colour = "black"),
-    legend.position = "right",
-    legend.key.height = unit(0.45, "in")
-    #legend.title=element_blank()
   ),
   scale_shape_manual(values=c(21:25)),
   scale_fill_viridis_c(option="rocket",
@@ -58,16 +55,22 @@ ggplot()+
   geom_curve(data=curves.df,aes(x=x1,y=y1,xend=x2,yend=y2), color="black",curvature=0.1)+
   geom_polygon(data=polygon.df,aes(x=x1,y=y1),color=NA,fill="grey90")+
   geom_segment(data=lines.df,aes(x=x1,y=y1,xend=x2,yend=y2), color="black")+
-  #geom_ellipse(aes(x0 = 5.5, y0 = 3, a = 0.3, b = 0.8, angle = 45), fill="white")+
   geom_text(data=text.df,aes(x=x,y=y,label=text))+
-  geom_point(data=grainstats.df,aes(x=mean.phi, y=abs(sd.phi),fill=year.mean, color=year.mean, shape=location),
+  geom_point(data=data.df,aes(x=mean.phi, y=abs(sd.phi),fill=year.mean, color=year.mean, shape=location),
              color="black", size=2, alpha=0.8)+
   scale_x_continuous(trans="log2",limits=c(1,10), breaks=c(1:10),expand = c(0, 0))+
   scale_y_continuous(trans="log2",limits=c(1,5), breaks=c(1:10),expand = c(0, 0))+
   labs(x=bquote("Mean"~"("*phi*")"),
        y=bquote("Sorting"~"("*phi*")"),
-       fill="Year",shape="Location")
+       fill="Year",shape="Location")+
+  theme(legend.position = "right",
+        legend.key.height = unit(0.45, "in"))+
+  scale_fill_viridis_c(option="rocket",
+                       breaks=c(2000,1900,1800,1700),
+                       labels=c("2000","1900","1800","Before\n1800"),
+                       guide = guide_colorbar(frame.colour = "black",
+                                              ticks.colour = "black"))
 
-ggsave("figures/Fig.4.jpg", width=6, height=5)
+ggsave("figures/Fig4.png", width=6, height=5, dpi=600)
 
 

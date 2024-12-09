@@ -4,7 +4,6 @@
 
 library(tidyverse)
 
-
 # create default graphing theme -------------------------------------------
 
 update_geom_defaults("point", list(shape = 21, fill="grey", stroke=0.8))
@@ -40,8 +39,8 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                                 "N.storage","year.mean","clay.pct","sand.pct","gravel.pct",
                                 "median.grainsize.phi","accretion.rate.gcm2yr",
                                 "mean.phi","sd.phi","C.P.ratio",
-                                "137Cs_activity.bqkg","210Pb_excess.bqkg",
-                                "137Cs_uncertainty.bqkg","210Pb_uncertainty.bqkg",
+                                "Cs137_activity.bqkg","Pb210.bqkg",
+                                "Cs137_uncertainty.bqkg","Pb210_sd.bqkg",
                                 "year.min","year.max"),
                          factor1=as.character(
                            c(
@@ -68,14 +67,14 @@ ylabels.df <- data.frame(name=c('location','depth.cm','%N', "d15N.permil", "%C.t
                              bquote("Sand"~"(%)"),
                              bquote("Gravel"~"(%)"),
                              bquote("Median"~"Grainsize"~"("*phi*")"),
-                             bquote("Accretion"~"Rate"~"(g/"*cm^2*"/yr)"),
+                             bquote("Accretion"~"Rate"~"(g"~cm^-2~yr^-1*")"),
                              bquote("Mean"~"Grainsize"~"("*phi*")"),
                              bquote("Sorting"~"("*phi*")"),
                              bquote("C:P"~"Ratio"),
-                             bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
-                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
-                             bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq/kg)"),
-                             bquote(scriptstyle(atop(210,))*"Pb"~"Excess"~"(Bq/kg)"),
+                             bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq"~kg^-1*")"),
+                             bquote(scriptstyle(atop(210,))*"Pb"~"Activity"~"(Bq"~kg^-1*")"),
+                             bquote(scriptstyle(atop(137,))*"Cs"~"Activity"~"(Bq"~kg^-1*")"),
+                             bquote(scriptstyle(atop(210,))*"Pb"~"Activity"~"(Bq"~kg^-1*")"),
                              bquote("Min"),
                              bquote("Max")
                            )

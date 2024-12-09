@@ -125,7 +125,7 @@ make_plot <- function(long.df, changepoints.df){
               fill="grey50", alpha=0.2)+
     geom_ribbon(data=model.df,
                 aes(y=year.mean, x=fit, xmin=fit.lower, xmax=fit.upper),
-                fill="grey50", color="grey50", alpha=0.2)+
+                fill="grey50", alpha=0.2)+
     geom_point(data=filled_points.df,
                aes(y=year.mean, x=value, fill=location, shape=location),
                alpha=0.8, size=2.5, color="black")+
@@ -157,7 +157,7 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/v2/Fig3.png",width=mywidth, height=myheight)
+ggsave("figures/v2/Fig5.png",width=mywidth, height=myheight)
 
 # elemental ratios --------------------------------------------------------
 
@@ -167,12 +167,12 @@ temp.df <- plot_longer(data.df,model.df,
 line_factors <- temp.df$factor %>%
   unique()
 
-lines.df <- data.frame(factor=line_factors,x=c(6.625,106,16))
+lines.df <- data.frame(factor=line_factors,x=c(NA,NA,16))
 
 make_plot(temp.df, changepoints.df)+
   geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")
 
-ggsave("figures/v2/Fig5.png",width=mywidth, height=myheight)
+ggsave("figures/v2/Fig6.png",width=mywidth, height=myheight)
 
 # isotopes ----------------------------------------------------------------
 
@@ -181,7 +181,7 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/v2/Fig6.png",width=mywidth, height=myheight)
+ggsave("figures/v2/Fig7.png",width=mywidth, height=myheight)
 
 # elemental composition ---------------------------------------------------
 
@@ -190,5 +190,5 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/v2/S1.png",width=mywidth, height=myheight)
+ggsave("figures/v2/S4.png",width=mywidth, height=myheight)
 

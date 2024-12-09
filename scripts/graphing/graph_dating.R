@@ -4,51 +4,16 @@ rm(list = ls()) #clear environment
 # import packages ---------------------------------------------------------
 
 library(tidyverse)
-library(readxl)
-library(progress)
-library(RColorBrewer)
 library(ggsci)
+library(scales) #for parse_format()
 
 # import data -------------------------------------------------------------
 
-data.df <- read_excel("raw/raw_dating.xlsx") %>%
-  as.data.frame() %>%
+data.df <- read.csv("raw/dating/raw_dating.csv") %>%
   mutate(location=factor(location,levels=c("North","Middle","South")))
 
-load("Rdata/dating.Rdata")
-
-dating.df <- dating.df %>%
-  filter(depth.cm>=0) %>%
-  mutate(location=factor(location,levels=c("North","Middle","South")))
-
-
-# end pb ------------------------------------------------------------------
-
-result.list <- list()
-
-for (mylocation in unique(data.df$location)){
-  
-  end.pb <- FALSE
-  
-  df <- dating.df %>%
-    filter(location==mylocation) %>%
-    arrange(depth.cm)
-  
-  for (row in 1:nrow(df)){
-    
-    if (!is.na(df[row,"end.pb"])){
-      end.pb <- TRUE
-    }
-    
-    df[row,"end.pb"] <- end.pb
-    
-  }
-  
-  result.list <- append(result.list, list(df))
-  
-}
-
-dating.df <- bind_rows(result.list)
+endpb.df <- data.frame(location=as.factor(c("North","Middle","South")),
+                       end.pb = c(38,38,42))
 
 # graphing parameters -----------------------------------------------------
 
@@ -76,45 +41,73 @@ plot_longer <- function(data.df,long_cols){
   return (plot.df)
 }
 
-# dating ---------------------------------------------------------------
 
-fill.df <- plot_longer(data.df,c("137Cs_activity.bqkg","210Pb_excess.bqkg")) %>%
-  select(c("location","depth.cm","factor","value"))
+# format data for the plot ------------------------------------------------
 
-error.df <- plot_longer(data.df,c("137Cs_uncertainty.bqkg","210Pb_uncertainty.bqkg")) %>%
-  select(c("location","depth.cm","depth.min","depth.max","factor","value")) %>%
-  rename("uncertainty"="value")
+#137Cs data
+cs.df <- data.df %>%
+  select(location, depth.cm, thickness.cm, Cs137_activity.bqkg, Cs137_uncertainty.bqkg)
 
-fill.df <- full_join(fill.df,error.df) %>%
-  mutate(max=value+uncertainty,
-         min=value-uncertainty,
-         vline=0)
+colnames(cs.df) <- c("location","depth.cm","thickness.cm","value","uncertainty")
 
-year.df <- plot_longer(dating.df,c("year.mean")) %>%
-  select(c("location","depth.cm","factor","value"))
+cs.df <- cs.df %>%
+  filter(value>0) %>%
+  mutate(name = "Cs137_activity.bqkg",
+         activity = name)
 
-error.df <- dating.df %>%
-  select(location, depth.cm, year.min, year.max, end.pb) %>%
-  rename(min=year.min, max=year.max)
+cs.df <- left_join(cs.df, ylabels.df)
 
-year.df <- left_join(year.df, error.df)
+pb.df <- data.df %>%
+  select(location, depth.cm, thickness.cm, Pb210.bqkg, Ra226.bqkg) %>%
+  pivot_longer(cols=c("Pb210.bqkg", "Ra226.bqkg"),names_to="activity")
 
-year.df <- bind_rows(fill.df, year.df)
+pb_error.df <- data.df %>%
+  select(location, depth.cm, thickness.cm, Pb210_sd.bqkg, Ra226_sd.bqkg) %>%
+  rename(Pb210.bqkg=Pb210_sd.bqkg, Ra226.bqkg=Ra226_sd.bqkg) %>%
+  pivot_longer(cols=c("Pb210.bqkg", "Ra226.bqkg"), names_to="activity", values_to = "uncertainty")
+  
+pb.df <- left_join(pb.df, pb_error.df) %>%
+  mutate(name="Pb210.bqkg")
 
-ggplot(year.df)+
+pb.df <- left_join(pb.df, ylabels.df)
+
+pb.df <- left_join(pb.df, endpb.df)
+
+plot.df <- bind_rows(cs.df, pb.df) %>%
+  mutate(activity=factor(activity,
+                     labels=c(bquote(scriptstyle(atop(137,))*"Cs"),
+                              bquote(scriptstyle(atop(210,))*"Pb"),
+                              bquote(scriptstyle(atop(226,))*"Ra"))))
+
+year.df <- data.df %>%
+  select(location, depth.cm, year.min, year.max, year.mean) %>%
+  mutate(factor1="Year")
+
+year.df <- left_join(year.df, endpb.df) %>%
+  mutate(plot.pb=ifelse(depth.cm>end.pb, FALSE,TRUE))
+
+ggplot(plot.df)+
   basetheme+
-  geom_area(data=fill.df, aes(y=depth.cm,x=value, fill=location),orientation="y", alpha=0.3)+
-  geom_line(aes(y=depth.cm,x=value),orientation="y")+
-  geom_errorbarh(aes(x=value,y=depth.cm,
-                     xmin=min, xmax=max),alpha=0.8)+
-  geom_point(aes(y=depth.cm, x=value, fill=location, shape=location),
-           size=2.5,color="black",alpha=0.7)+
-  facet_grid(location~factor,scales="free_x",labeller = label_parsed)+
-  labs(x=NULL,y="Depth\ncm",shape=legend_title,color=legend_title,fill=legend_title,linetype=legend_title)+
-  scale_shape_manual(values=c(21:24))+
-  theme(legend.position="none")+
+  geom_hline(aes(yintercept=end.pb), linetype="dashed")+
+  geom_hline(data=year.df, aes(yintercept=end.pb), linetype="dashed")+
+  geom_rect(aes(xmin=value-uncertainty,
+                            xmax=value+uncertainty,
+                            ymin=depth.cm,
+                            ymax=depth.cm-thickness.cm,
+                            fill=activity),
+            color="black", alpha=0.8
+            )+
+  geom_ribbon(data=subset(year.df, plot.pb==TRUE), 
+              aes(xmin=year.min, xmax=year.max, y=depth.cm), fill="grey", color="black")+
+  geom_line(data=year.df, aes(x=year.mean, y=depth.cm), linewidth=1, linetype="11")+
+  geom_line(data=subset(year.df, plot.pb==TRUE), aes(x=year.mean, y=depth.cm), linewidth=1)+
+  facet_grid(location~factor1, scales="free_x",labeller = label_parsed)+
   scale_y_reverse()+
-  geom_vline(data=fill.df, aes(xintercept=vline))
+  scale_fill_viridis_d(option="mako", direction = -1, end=0.9, labels = parse_format())+
+  labs(x=NULL,y="Depth\n(cm)")+
+  theme(panel.grid.major = element_line(color="grey"),
+        legend.position="top",
+        legend.title=element_blank())
 
-ggsave("figures/S6.png",width=12, height=10)
+ggsave("figures/Fig3.png",width=10, height=8)
 

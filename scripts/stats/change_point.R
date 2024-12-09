@@ -5,9 +5,9 @@ rm(list=ls())
 library(mcp)
 library(changepoint)
 library(segmented)
-library(tidyverse)
 library(forecast) #for arima
-
+library(vegan) #for permanova
+library(tidyverse)
 
 update_geom_defaults("point", list(shape = 21, fill="grey"))
 
@@ -22,10 +22,22 @@ data.df <- data.df %>%
   arrange(year.mean) %>%
   drop_na(cluster, N.P.ratio)
 
-# changepoint analysis ----------------------------------------------------
-
 response.list <- c("sand.pct","mean.phi","sd.phi","accretion.rate.gcm2yr","%C.organic","%N","P.total.pct.e2",
                    "SiO2.prct","C.N.ratio","N.P.ratio","C.P.ratio","d15N.permil","d13C.organic")
+
+
+# first, test for differences between cores -------------------------------
+
+#input data for permanova
+perm.df <- data.df %>%
+  select(c("location", response.list))
+
+perm.df[,2:14] <- scale(perm.df[,2:14])
+
+#perform permanova
+adonis2(perm.df[,2:14]~perm.df$location, method="euclidean", permutations = 99999)
+
+# changepoint analysis ----------------------------------------------------
 
 model.list <- list()
 changepoint.list <- list()
