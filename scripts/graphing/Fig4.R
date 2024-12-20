@@ -1,22 +1,21 @@
 
 rm(list = ls()) #clear environment
 
-library(tidyverse)
+# install packages --------------------------------------------------------
+
 library(ggsci)
 library(ggforce) #for ellipse
+library(plyr) #for round_any
+library(tidyverse)
+
+# import data -------------------------------------------------------------
 
 source("scripts/graphing/configure_graphing.R")
 
-data.df <- readRDS("Rdata/compiled_data.rds")
-
-# graphing parameters -----------------------------------------------------
-
-theme <- list(
-  basetheme,
-  scale_fill_viridis_c(option="rocket",
-                       guide = guide_colorbar(frame.colour = "black",
-                                              ticks.colour = "black"))
-)
+data.df <- readRDS("Rdata/compiled_data.rds") %>%
+  mutate(century=as.character(round_any(year.mean, 100, f=floor)),
+         century=ifelse(depth.cm<15 & is.na(century), "2000", century),
+         century=ifelse(depth.cm>40 & is.na(century), "1700", century),)
 
 
 # graphing ----------------------------------------------------------------
@@ -44,20 +43,18 @@ ggplot()+
   geom_segment(data=arrow.df,aes(x=x1,y=y1,xend=x2,yend=y2), color="black",
                arrow=arrow(length = unit(0.1,"cm")))+
   geom_text(data=text.df,aes(x=x,y=y,label=text))+
-  geom_point(data=data.df,aes(x=mean.phi, y=abs(sd.phi),fill=year.mean, color=year.mean, shape=location),
+  geom_point(data=data.df,aes(x=mean.phi, y=abs(sd.phi),fill=century, color=century, shape=location),
              color="black", size=2, alpha=0.8)+
   scale_x_continuous(trans="log2",limits=c(1,10), breaks=c(1:10),expand = c(0, 0))+
   scale_y_continuous(trans="log2",limits=c(1,5), breaks=c(1:10),expand = c(0, 0))+
   labs(x=bquote("Mean"~"("*phi*")"),
        y=bquote("Sorting"~"("*phi*")"),
-       fill="Year",shape="Location")+
+       fill="Century",shape="Location")+
   theme(legend.position = "right",
         legend.key.height = unit(0.45, "in"))+
-  scale_fill_viridis_c(option="rocket",
+  scale_fill_viridis_d(option="rocket",
                        breaks=c(2000,1900,1800,1700),
-                       labels=c("2000","1900","1800","Before\n1800"),
-                       guide = guide_colorbar(frame.colour = "black",
-                                              ticks.colour = "black"))
+                       labels=c("2000","1900","1800","Before\n1800"))
 
 ggsave("figures/Fig4.png", width=6, height=5, dpi=600)
 

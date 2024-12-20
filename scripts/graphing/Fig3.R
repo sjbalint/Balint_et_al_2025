@@ -102,7 +102,7 @@ ggplot(plot.df)+
   facet_grid(location~factor1, scales="free_x",labeller = label_parsed)+
   scale_y_reverse()+
   scale_fill_viridis_d(option="mako", direction = -1, end=0.9, labels = parse_format())+
-  labs(x=NULL,y="Depth\n(cm)")+
+  labs(x=NULL,y="Depth (cm)")+
   theme(panel.grid.major = element_line(color="grey"),
         legend.position="top",
         legend.title=element_blank())
