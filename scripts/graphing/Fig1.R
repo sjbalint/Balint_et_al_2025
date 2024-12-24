@@ -14,7 +14,6 @@ library(sf) #to make maps
 
 sf_use_s2(FALSE) #don't model the globe as a sphere
 
-
 # import data ------------------------------------------------------------
 
 #this shapefile is from the NBEP

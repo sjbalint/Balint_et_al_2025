@@ -13,6 +13,15 @@ library(ggsci)
 library(cowplot)
 library(ggrepel) #for managing the text
 
+
+# configure graphing ------------------------------------------------------
+
+aspect_ratio=8/10
+
+mywidth=169*2
+
+myheight=mywidth*aspect_ratio
+
 # load data ---------------------------------------------------------------
 
 #import population data
@@ -155,4 +164,4 @@ plot <- plot_grid(p1,p2,ncol=1, align = "v", axis="tb", rel_heights=c(1,2))
 
 ggdraw(plot)
 
-ggsave(plot=plot,"figures/Fig2.pdf",width=10, height=8)
+ggsave(plot=plot,"figures/Fig2.pdf",width=mywidth, height=myheight, units="mm")

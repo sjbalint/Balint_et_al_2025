@@ -13,6 +13,12 @@ library(viridis) #to define colors manually
 
 source("scripts/graphing/configure_graphing.R")
 
+aspect_ratio=5/6
+
+mywidth=81*2
+
+myheight=mywidth*aspect_ratio
+
 data.df <- readRDS("Rdata/compiled_data.rds") %>%
   mutate(century=as.character(round_any(year.mean, 100, f=floor)),
          century=ifelse(depth.cm<15 & is.na(century), "2000", century),
@@ -59,7 +65,7 @@ ggplot()+
                        breaks=c(2000,1900,1800,1700),
                        labels=c("2000","1900","1800","Before\n1800"))
 
-ggsave("figures/Fig4.png", width=6, height=5, dpi=600)
+ggsave("figures/Fig4.png", width=mywidth, height=myheight, units="mm")
 
 # size class plot ---------------------------------------------------------
 
@@ -80,4 +86,4 @@ ggplot(class.df, aes(x=depth.cm+thickness.cm/2,y=percentage, fill=class, width=t
        fill="Classification")+
   scale_fill_manual(values = c(colors1, colors2))
 
-ggsave("figures/FigS4.png",width=6, height=5, dpi=600)
+ggsave("figures/FigS4.png",width=mywidth, height=myheight, units="mm")

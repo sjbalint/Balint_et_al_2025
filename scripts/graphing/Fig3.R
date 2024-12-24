@@ -17,8 +17,11 @@ endpb.df <- data.frame(location=as.factor(c("North","Middle","South")),
 
 # graphing parameters -----------------------------------------------------
 
-mywidth=6
-myheight=10
+aspect_ratio=8/10
+
+mywidth=105*2
+
+myheight=mywidth*aspect_ratio
 
 legend_title <- NULL
 
@@ -107,5 +110,5 @@ ggplot(plot.df)+
         legend.position="top",
         legend.title=element_blank())
 
-ggsave("figures/Fig3.png",width=10, height=8)
+ggsave("figures/Fig3.png",width=mywidth, height=myheight, units="mm")
 

@@ -19,8 +19,11 @@ data.df <- data.df %>%
 
 # graphing parameters -----------------------------------------------------
 
-mywidth=10
-myheight=8
+aspect_ratio=8/10
+
+mywidth=105*2
+
+myheight=mywidth*aspect_ratio
 
 legend_title <- NULL
 
@@ -122,7 +125,7 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/Fig5.png",width=mywidth, height=myheight)
+ggsave("figures/Fig5.png",width=mywidth, height=myheight, units="mm")
 
 # elemental ratios --------------------------------------------------------
 
@@ -137,7 +140,7 @@ lines.df <- data.frame(factor=line_factors,x=c(NA,NA,16))
 make_plot(temp.df, changepoints.df)+
   geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")
 
-ggsave("figures/Fig6.png",width=mywidth, height=myheight)
+ggsave("figures/Fig6.png",width=mywidth, height=myheight, units="mm")
 
 # isotopes ----------------------------------------------------------------
 
@@ -146,7 +149,7 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/Fig7.png",width=mywidth, height=myheight)
+ggsave("figures/Fig7.png",width=mywidth, height=myheight, units="mm")
 
 # elemental composition ---------------------------------------------------
 
@@ -155,5 +158,5 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/FigS5.png",width=mywidth, height=myheight)
+ggsave("figures/FigS5.png",width=mywidth, height=myheight, units="mm")
 
