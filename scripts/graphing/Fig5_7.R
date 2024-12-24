@@ -155,5 +155,5 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/S4.png",width=mywidth, height=myheight)
+ggsave("figures/FigS5.png",width=mywidth, height=myheight)
 

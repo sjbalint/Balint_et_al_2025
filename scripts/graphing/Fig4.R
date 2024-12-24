@@ -7,6 +7,7 @@ library(ggsci)
 library(ggforce) #for ellipse
 library(plyr) #for round_any
 library(tidyverse)
+library(viridis) #to define colors manually
 
 # import data -------------------------------------------------------------
 
@@ -17,8 +18,10 @@ data.df <- readRDS("Rdata/compiled_data.rds") %>%
          century=ifelse(depth.cm<15 & is.na(century), "2000", century),
          century=ifelse(depth.cm>40 & is.na(century), "1700", century),)
 
+class.df <- readRDS("Rdata/grainclass.rds")
 
-# graphing ----------------------------------------------------------------
+# bivariate plot ----------------------------------------------------------
+
 
 ellipse.df <- data.frame(x0=c(6, 4.5, 2.7),
                          y0=c(3.1, 2.4, 2.3),
@@ -58,4 +61,23 @@ ggplot()+
 
 ggsave("figures/Fig4.png", width=6, height=5, dpi=600)
 
+# size class plot ---------------------------------------------------------
 
+colors1 <- viridis(6, option = "rocket")[1:6]
+colors2 <- viridis(7, option = "mako")[6:1]
+
+ggplot(class.df, aes(x=depth.cm+thickness.cm/2,y=percentage, fill=class, width=thickness.cm))+
+  basetheme+
+  geom_bar(position="fill",stat="identity", color="black", linewidth=0.2)+
+  coord_flip()+
+  #scale_x_reverse(labels=function(x)2020-(x*3))+
+  scale_x_reverse(expand=expansion(c(0,0)))+
+  scale_y_continuous(labels=function(y)y*100)+
+  facet_wrap(~location)+
+  theme(legend.position="right")+
+  labs(x="Depth (cm)",
+       y="Percentage",
+       fill="Classification")+
+  scale_fill_manual(values = c(colors1, colors2))
+
+ggsave("figures/FigS4.png",width=6, height=5, dpi=600)
