@@ -4,7 +4,6 @@ radiometric dating, and historical ecology
 ================
 Sawyer J. Balint, Morgan Schwartz, Andrew Gray, Tim Cranston, Robinson
 W. Fulweiler, Melissa Hagy, Rick McKinney, and Autumn Oczkowski
-(2024)
 
 This repository contains data for the manuscript “Three centuries of
 biogeochemical change in a temperate embayment as revealed by sediment

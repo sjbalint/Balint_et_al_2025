@@ -2,7 +2,6 @@
 title: "Supplemental information for: Three centuries of biogeochemical change in a temperate embayment as revealed by sediment core stable isotopes, radiometric dating, and historical ecology"
 
 author: "Sawyer J. Balint, Morgan Schwartz, Andrew Gray, Tim Cranston, Robinson W. Fulweiler, Melissa Hagy, Rick McKinney, and Autumn Oczkowski"
-date: '(2024)'
 output: github_document
 ---
 
