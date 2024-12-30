@@ -38,5 +38,10 @@ statistics
 <h3>
 /figures
 </h3>
-
 .png figures used in the manuscript
+<h3>
+/Plum_runs
+</h3>
+
+R script, input, and output files for chronological modelling using the
+`rplum` package.
