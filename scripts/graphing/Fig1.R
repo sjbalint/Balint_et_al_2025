@@ -17,7 +17,7 @@ sf_use_s2(FALSE) #don't model the globe as a sphere
 # import data ------------------------------------------------------------
 
 #this shapefile is from the NBEP
-load("Rdata/Nbay_GIS.Rdata")
+readRDS("Rdata/Nbay_GIS.rds")
 
 #location boundaries for new england
 xmin=-72.5
