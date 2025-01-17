@@ -110,5 +110,5 @@ ggplot(plot.df)+
         legend.position="top",
         legend.title=element_blank())
 
-ggsave("figures/Fig3.png",width=mywidth, height=myheight, units="mm")
+ggsave("figures/Fig3.pdf",width=mywidth, height=myheight, units="mm")
 

@@ -17,7 +17,7 @@ sf_use_s2(FALSE) #don't model the globe as a sphere
 # import data ------------------------------------------------------------
 
 #this shapefile is from the NBEP
-readRDS("Rdata/Nbay_GIS.rds")
+bay.sf <- readRDS("Rdata/Nbay_GIS.rds")
 
 #location boundaries for new england
 xmin=-72.5
@@ -102,7 +102,7 @@ p1 <- ggplot() +
                 ymin=st_bbox(ac.sf)[2],
                 xmax=st_bbox(ac.sf)[3],
                 ymax=st_bbox(ac.sf)[4]),
-            fill=NA, color="white", linewidth=1)+
+            fill=NA, color="white", linewidth=3*0.4)+
   coord_sf(expand=0)
 
 # map of new england ------------------------------------------------------
@@ -110,10 +110,10 @@ p1 <- ggplot() +
 #inset map of new england
 p2 <- ggplot(USA.sf) +
   theme_void()+
-  theme(panel.border = element_rect(color="white", linewidth=2),
-        panel.background = element_rect(fill="darkgrey"))+
+  theme(panel.border = element_rect(color="black", linewidth=2),
+        panel.background = element_rect(fill="white"))+
   geom_sf(fill="lightgrey", color="black")+
-  geom_point(aes(x=mean(xmin,xmax), y=mean(ymin,ymax)), shape=4, color = "darkred",size=2, stroke=3)+
+  geom_point(aes(x=mean(xmin,xmax), y=mean(ymin,ymax)), shape=4, color = "black",size=2, stroke=3)+
   coord_sf(expand=0)
 
 
@@ -125,13 +125,13 @@ p3 <- ggplot() +
   ac_sat+
   scale_fill_identity() +
   #with points to show where the cores are from
-  geom_sf(data=cores.sf, aes(shape=name), color="black", fill="darkred",
-          size=3, show.legend=FALSE)+
-  geom_sf_label(data=cores.sf, aes(label=name), alpha=0.7, size=3,
+  geom_sf(data=cores.sf, aes(shape=name), color="black", fill="white",
+          size=4, show.legend=FALSE)+
+  geom_sf_label(data=cores.sf, aes(label=name), alpha=0.7,
                 hjust=0, vjust=0, nudge_x=20, nudge_y=20)+
   scale_shape_manual(values=c(21:26))+
   coord_sf(expand=0)+
-  theme(panel.border = element_rect(color="white", linewidth=2))+
+  theme(panel.border = element_rect(color="white", linewidth=3))+
   annotation_scale(location = "br", width_hint = 0.8, text_col="white")
 
 # combine the plots -------------------------------------------------------
@@ -139,18 +139,21 @@ p3 <- ggplot() +
 final <- ggdraw() +
   draw_plot(p1) +
   draw_plot(p2,
-            scale = 0.25,
-            x = 0.71,
-            y = 0.84,
-            hjust = 0.5,
-            vjust = 0.5)+
+            scale = 0.3,
+            x = -0.06,
+            y = 0.005,
+            halign = 1,
+            valign = 1)+
   draw_plot(p3,
-            scale = 0.41,
-            x = 0.65,
-            y = 0.26,
-            hjust = 0.5,
-            vjust = 0.5)
+            scale = 0.45,
+            x = -0.06,
+            y = 0.02,
+            halign = 1,
+            valign = 0)
 
 #export
-ggsave("figures/Fig1.pdf")
+mywidth=169
+myheight = mywidth*(9.5/8)
+
+ggsave("figures/Fig1.pdf", width=mywidth, height=myheight, units="mm")
 

@@ -22,6 +22,6 @@ Corresponding author: Sawyer J. Balint
 <h3>/scripts</h3> R scripts that compile the raw data, generate figures, and perform statistics
 <h3>/Rdata</h3> .rds files of tidied data
 <h3>/export</h3> .csv files of compiled data and summary statistics
-<h3>/figures</h3> .png figures used in the manuscript
+<h3>/figures</h3> .pdf figures used in the manuscript
 <h3>/Plum_runs</h3> R script, input, and output files for chronological modelling using the `rplum` package.
 

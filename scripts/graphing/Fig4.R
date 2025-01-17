@@ -65,7 +65,7 @@ ggplot()+
                        breaks=c(2000,1900,1800,1700),
                        labels=c("2000","1900","1800","Before\n1800"))
 
-ggsave("figures/Fig4.png", width=mywidth, height=myheight, units="mm")
+ggsave("figures/Fig4.pdf", width=mywidth, height=myheight, units="mm")
 
 # size class plot ---------------------------------------------------------
 
@@ -86,4 +86,4 @@ ggplot(class.df, aes(x=depth.cm+thickness.cm/2,y=percentage, fill=class, width=t
        fill="Classification")+
   scale_fill_manual(values = c(colors1, colors2))
 
-ggsave("figures/FigS4.png",width=mywidth, height=myheight, units="mm")
+ggsave("figures/FigS4.pdf",width=mywidth, height=myheight, units="mm")

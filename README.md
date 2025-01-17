@@ -38,7 +38,7 @@ statistics
 <h3>
 /figures
 </h3>
-.png figures used in the manuscript
+.pdf figures used in the manuscript
 <h3>
 /Plum_runs
 </h3>

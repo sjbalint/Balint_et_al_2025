@@ -125,7 +125,7 @@ temp.df <- plot_longer(data.df, model.df,
 
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/Fig5.png",width=mywidth, height=myheight, units="mm")
+ggsave("figures/Fig5.pdf",width=mywidth, height=myheight, units="mm")
 
 # elemental ratios --------------------------------------------------------
 
@@ -140,23 +140,28 @@ lines.df <- data.frame(factor=line_factors,x=c(NA,NA,16))
 make_plot(temp.df, changepoints.df)+
   geom_vline(data=lines.df,aes(xintercept=x),linetype="dashed")
 
-ggsave("figures/Fig6.png",width=mywidth, height=myheight, units="mm")
+ggsave("figures/Fig6.pdf",width=mywidth, height=myheight, units="mm")
 
 # isotopes ----------------------------------------------------------------
 
 temp.df <- plot_longer(data.df, model.df,
                        c("d15N.permil","SiO2.prct","d13C.organic"))
 
+#because default ggsave can't handle complex unicode characters
+cairo_pdf("figures/Fig7.pdf",width=mywidth/25.4, height=myheight/25.4)
+
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/Fig7.png",width=mywidth, height=myheight, units="mm")
+dev.off()
 
 # elemental composition ---------------------------------------------------
 
 temp.df <- plot_longer(data.df, model.df,
                        c("%C.organic","%N","P.total.pct.e2"))
 
+
+
 make_plot(temp.df, changepoints.df)
 
-ggsave("figures/FigS5.png",width=mywidth, height=myheight, units="mm")
+ggsave("figures/FigS5.pdf",width=mywidth, height=myheight, units="mm")
 
