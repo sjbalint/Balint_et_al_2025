@@ -59,8 +59,11 @@ ggplot()+
   labs(x=bquote("Mean"~"("*phi*")"),
        y=bquote("Sorting"~"("*phi*")"),
        fill="Century",shape="Location")+
-  theme(legend.position = "right",
-        legend.key.height = unit(0.45, "in"))+
+  theme(legend.position = "top",
+        legend.key.height = unit(0.3, "in"),
+        legend.key.width = unit(0.1, "in"),
+        legend.title.position = "top",
+        legend.title=element_text(hjust=0.5))+
   scale_fill_viridis_d(option="rocket",
                        breaks=c(2000,1900,1800,1700),
                        labels=c("2000","1900","1800","Before\n1800"))

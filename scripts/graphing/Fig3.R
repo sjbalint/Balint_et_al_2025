@@ -108,7 +108,8 @@ ggplot(plot.df)+
   labs(x=NULL,y="Depth (cm)")+
   theme(panel.grid.major = element_line(color="grey"),
         legend.position="top",
-        legend.title=element_blank())
+        legend.title=element_blank(),
+        strip.text.y.right = element_text(angle=90))
 
 ggsave("figures/Fig3.pdf",width=mywidth, height=myheight, units="mm")
 
